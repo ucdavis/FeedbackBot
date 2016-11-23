@@ -1,4 +1,54 @@
-﻿body {
+﻿.issueCard {
+    width: 750px;
+    height: 200px;
+    border: 1px solid black;
+    display: flex; /* or inline-flex */
+    flex-direction: row;
+    align-items: flex-start;
+    margin: 10px;
+}
+
+.voteBox {
+    width: 100px;
+    height: 100px;
+    border: 1px solid black;
+    margin: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.vote {
+    margin: 10px;
+}
+
+.description {
+    width: 600px;
+    height: 100px;
+    border: 1px solid black;
+    margin: 10px;
+    padding: 5px;
+}
+
+.leftCard {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.rightCard {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.title {
+    margin: 10px;
+    margin-bottom: 0px;
+}
+
+body {
     padding-top: 50px;
     padding-bottom: 20px;
 }
