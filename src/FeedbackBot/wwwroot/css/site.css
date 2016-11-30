@@ -1,4 +1,9 @@
-﻿.issueCard {
+﻿form {
+    display: flex; /* or inline-flex */
+    flex-direction: column;
+    align-items: flex-start;
+}
+.issueCard {
     width: 750px;
     height: 200px;
     border: 1px solid black;

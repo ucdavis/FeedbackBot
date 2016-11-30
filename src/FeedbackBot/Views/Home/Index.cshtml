@@ -1,25 +1,38 @@
-﻿@model IReadOnlyList<Octokit.Issue>
+﻿@model IReadOnlyList<FeedbackBot.Controllers.HomeController.issuesContainer>
     @{
         ViewData["Title"] = "Home Page";
         <h3>@ViewData["Message"]</h3>
     }
 
 <div>
-    @foreach (var issue in Model)
+    @using (Html.BeginForm("createIssue", "Home"))
     {
-        <div class="issueCard">
-            <div class="leftCard">
-                <div class="voteBox">
-                    <p>5</p>
-                </div>
-                <button class="vote">VOTE</button>
-            </div>
-            <div class="rightCard">
-                <p class="title">@issue.Title</p>
-                <div class="description">
-                    <span>@issue.Body</span>
-                </div>
-            </div>
-        </div>
+        <b>Title:</b><input type="text" name="title" /><br />
+        <b>Description:</b><input type="text" name="description" /><br />
+        <input type="submit" />
     }
+
+
+        @foreach (var issue in Model)
+        {
+            <div class="issueCard">
+                <div class="leftCard">
+                    <div class="voteBox">
+                        <p>@issue.numOfVotes</p>
+                    </div>
+                    @using (Html.BeginForm("vote", "Home"))
+                    {
+                        <input type="text" name="voteID" value="@issue.number"/><br />
+                        <input type="submit" id="@issue.number"/>
+                    }
+                </div>
+                <div class="rightCard">
+                    <p class="title">@issue.title</p>
+                    <div class="description">
+                        <span>@issue.body</span><br />
+                        <span>@issue.listOfVoters</span>
+                    </div>
+                </div>
+            </div>
+        }
 </div>
