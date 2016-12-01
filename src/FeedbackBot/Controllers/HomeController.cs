@@ -14,7 +14,7 @@ namespace FeedbackBot.Controllers
         {
             // Github Authentication
             var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            var basicAuth = new Credentials("UCDFeedbackBot", "99LinesOfCode"); 
+            var basicAuth = new Credentials("UCDFeedbackBot", ""); 
             client.Credentials = basicAuth;
             var user = await client.User.Current();
 
@@ -48,7 +48,7 @@ namespace FeedbackBot.Controllers
         {
             // Github Authentication
             var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            var basicAuth = new Credentials("UCDFeedbackBot", "99LinesOfCode"); 
+            var basicAuth = new Credentials("UCDFeedbackBot", ""); 
             client.Credentials = basicAuth;
             var user = await client.User.Current();
 
@@ -73,7 +73,7 @@ namespace FeedbackBot.Controllers
 
             // Github Authentication
             var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            var basicAuth = new Credentials("UCDFeedbackBot", "99LinesOfCode"); // NOTE: not real credentials
+            var basicAuth = new Credentials("UCDFeedbackBot", ""); // NOTE: not real credentials
             client.Credentials = basicAuth;
             var user = await client.User.Current();
 
@@ -138,7 +138,7 @@ namespace FeedbackBot.Controllers
 
         public IActionResult About()
         {
-            ViewData["Message"] = "Your application descriptieeeeeeon page.";
+            ViewData["Message"] = "Your application description page.";
 
             return View();
         }
