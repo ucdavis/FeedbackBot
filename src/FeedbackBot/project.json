@@ -20,7 +20,7 @@
     "Microsoft.Extensions.Logging": "1.1.0",
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0",
     "Octokit": "0.23.0",
-    "Microsoft.Net.Http": "2.2.29"
+    "Microsoft.Net.Http": "2.2.29",
     "Microsoft.Extensions.Logging.Console": "1.1.0",
     "Microsoft.Extensions.Logging.Debug": "1.1.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.1.0",
