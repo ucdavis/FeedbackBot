@@ -5,13 +5,15 @@
     }
 
 <div>
-    @using (Html.BeginForm("createIssue", "Home"))
-    {
-        <b>Title:</b><input type="text" name="title" /><br />
-        <b>Description:</b><input type="text" name="description" /><br />
-        <input type="submit" />
-    }
-
+    <div id="newIssueBox" >
+        <h4>Submit New Feedback</h4>
+        @using (Html.BeginForm("createIssue", "Home"))
+        {
+            <b>Title:</b><input type="text" name="title" /><br />
+            <b>Description:</b><input id="descriptionTextBox" type="text" name="description" /><br />
+            <input type="submit" />
+        }
+    </div>
 
         @foreach (var issue in Model)
         {
@@ -19,12 +21,15 @@
                 <div class="leftCard">
                     <div class="voteBox">
                         <p>@issue.numOfVotes</p>
+
                     </div>
+                    <div class="voteButton">
                     @using (Html.BeginForm("vote", "Home"))
                     {
-                        <input type="text" name="voteID" value="@issue.number"/><br />
-                        <input type="submit" id="@issue.number"/>
+                        <input type="text" class="voteID" name="voteID" value="@issue.number" style="display:none;" /><br />
+                        <input type="submit" value="Vote" id="@issue.number" />
                     }
+                    </div>
                 </div>
                 <div class="rightCard">
                     <p class="title">@issue.title</p>
