@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Octokit;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FeedbackBot.Controllers
 {
+    [Authorize(ActiveAuthenticationSchemes = "ucdcas")]
     public class HomeController : Controller
     {
         public async Task<IActionResult> Index()
