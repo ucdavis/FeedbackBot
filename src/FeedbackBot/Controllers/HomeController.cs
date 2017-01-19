@@ -11,14 +11,14 @@ namespace FeedbackBot.Controllers
 {
     [Authorize(ActiveAuthenticationSchemes = "ucdcas")]
     public class HomeController : Controller
-    {
+    {  
         public async Task<IActionResult> Index()
         {
             // Github Authentication
             var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            var basicAuth = new Credentials("UCDFeedbackBot", ""); 
+            var basicAuth = new Credentials("UCDFeedbackBot", "99LinesOfCode"); 
             client.Credentials = basicAuth;
-            var user = await client.User.Current();
+            var kerberos = User.Identity.Name;
 
             // Filters: Created by User, Labels "feedback", and default set to only open feedback issues
             var recently = new IssueRequest
@@ -33,6 +33,7 @@ namespace FeedbackBot.Controllers
             foreach (Issue i in issues)
             {
                 var newIssueContainer = new issuesContainer();
+                newIssueContainer.kerberos = kerberos;
                 newIssueContainer.deserialize(i);
                 issueContainerList.Add(newIssueContainer);
             }
@@ -50,14 +51,14 @@ namespace FeedbackBot.Controllers
         {
             // Github Authentication
             var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            var basicAuth = new Credentials("UCDFeedbackBot", ""); 
+            var basicAuth = new Credentials("UCDFeedbackBot", "99LinesOfCode"); 
             client.Credentials = basicAuth;
-            var user = await client.User.Current();
+            var kerberos = User.Identity.Name;
 
             // Initialize new issue
             var createIssue = new NewIssue(title)
             {
-                Body = description + "\r\n--------------------\r\nVotes: 0\r\nVoters: ",
+                Body = description + "\r\n--------------------\r\nVotes: 1\r\nVoters: " + kerberos,
                 Labels = { "feedback" }
             };
             var issue = await client.Issue.Create("ucdavis", "FeedbackBot", createIssue);
@@ -75,23 +76,40 @@ namespace FeedbackBot.Controllers
 
             // Github Authentication
             var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            var basicAuth = new Credentials("UCDFeedbackBot", ""); // NOTE: not real credentials
+            var basicAuth = new Credentials("UCDFeedbackBot", "99LinesOfCode"); // NOTE: not real credentials
             client.Credentials = basicAuth;
-            var user = await client.User.Current();
+            var kerberos = User.Identity.Name;
 
             var issue = await client.Issue.Get("ucdavis", "FeedbackBot", issueIDInt);
             var newIssueContainer = new issuesContainer();
+            newIssueContainer.kerberos = kerberos;
             newIssueContainer.deserialize(issue);
 
-            // Update vote count
-            int newVoteCount = newIssueContainer.numOfVotesInt + 1;
-            newIssueContainer.numOfVotesInt = newVoteCount;
-            newIssueContainer.numOfVotes = newVoteCount.ToString();
-            
+            if (newIssueContainer.voteState == "unvote")
+            {
+                int newVoteCount = newIssueContainer.numOfVotesInt - 1;
+                newIssueContainer.numOfVotesInt = newVoteCount;
+                newIssueContainer.numOfVotes = newVoteCount.ToString();
+
+                newIssueContainer.listOfVoters.Remove(kerberos);
+                newIssueContainer.stringOfVoters = string.Join(",", newIssueContainer.listOfVoters.ToArray()).Trim().TrimStart(',');
+            }
+            else
+            {
+                // Update vote count
+                int newVoteCount = newIssueContainer.numOfVotesInt + 1;
+                newIssueContainer.numOfVotesInt = newVoteCount;
+                newIssueContainer.numOfVotes = newVoteCount.ToString();
+                newIssueContainer.listOfVoters.Add(kerberos);
+                newIssueContainer.stringOfVoters = string.Join(", ", newIssueContainer.listOfVoters.ToArray()).Trim().TrimStart(',');
+            }
+
             // Update issue on GitHub
             var update = issue.ToUpdate();
             update.Body = newIssueContainer.serialize();
             await client.Issue.Update("ucdavis", "FeedbackBot", issueIDInt, update);
+
+            //Update voters
 
             return RedirectToAction("index");
         }
@@ -100,15 +118,17 @@ namespace FeedbackBot.Controllers
             public string title { get; set; }
             public string numOfVotes { get; set; }
             public int numOfVotesInt { get; set; }
-            public string listOfVoters { get; set; }
-            public string[] arrayOfVoters { get; set; }
+            public string stringOfVoters { get; set; }
+            public List<string> listOfVoters { get; set; }
             public string body { get; set; }
             public int number { get; set; }
+            public string voteState { get; set; }
+            public string kerberos { get; set; }
 
             // Returns string of description for GitHub issue body
             public string serialize()
             {
-                var returnBody = this.body + "\r\n--------------------\r\nVotes: " + numOfVotes + "\r\nVoters: " + listOfVoters;
+                var returnBody = this.body + "\r\n--------------------\r\nVotes: " + numOfVotes + "\r\nVoters: " + stringOfVoters;
                 return returnBody;
             }
 
@@ -131,9 +151,16 @@ namespace FeedbackBot.Controllers
 
                 // Voters
                 var indexOfVoters = issueBody.IndexOf("Voters:");
-                Char delimiter = ',';
-                this.listOfVoters = issueBody.Substring(indexOfVoters + 7);
-                this.arrayOfVoters = this.listOfVoters.Split(delimiter);
+                this.stringOfVoters = issueBody.Substring(indexOfVoters + 7);
+                this.listOfVoters = this.stringOfVoters.Split(',').Select(d => d.Trim()).ToList();
+
+                if (issueBody.IndexOf(kerberos) > 0)
+                {
+                    voteState = "unvote";
+                } else
+                {
+                    voteState = "vote";
+                }
             }
         }
 
