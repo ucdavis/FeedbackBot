@@ -15,7 +15,7 @@ namespace FeedbackBot.Controllers
 
         public static class Globals
         {
-            public static String kerberos { get; set; } // Modifiable in Code
+            public static String kerberos { get; set; } 
         }
 
         public GitHubClient initialize()
@@ -30,6 +30,8 @@ namespace FeedbackBot.Controllers
         {
             // Github Authentication
             var client = initialize();
+
+            // Initialize kerberos 
             Globals.kerberos = User.Identity.Name;
 
             // Filters: Created by User, Labels "feedback", and default set to only open feedback issues
@@ -45,7 +47,7 @@ namespace FeedbackBot.Controllers
             foreach (Issue i in issues)
             {
                 var newIssueContainer = new issuesContainer();
-                newIssueContainer.deserialize(i, Globals.kerberos);
+                newIssueContainer.deserialize(i);
                 issueContainerList.Add(newIssueContainer);
             }
             ViewData["Message"] = "Current Feedback";
@@ -101,7 +103,7 @@ namespace FeedbackBot.Controllers
 
             var issue = await client.Issue.Get("ucdavis", "FeedbackBot", issueIDInt);
             var newIssueContainer = new issuesContainer();
-            newIssueContainer.deserialize(issue, Globals.kerberos);
+            newIssueContainer.deserialize(issue);
 
             if (newIssueContainer.voteState == "unvote")
             {
@@ -130,6 +132,10 @@ namespace FeedbackBot.Controllers
             return RedirectToAction("index");
         }
 
+        /*
+         * Displays the details of an issue along with all its comments
+         * @param string voteID - The number of the issue we are upvoting
+         */
         [HttpGet("/issues/{id}")]
         public async Task<IActionResult> Details(string id)
         {
@@ -141,7 +147,7 @@ namespace FeedbackBot.Controllers
             // Getting issue
             var issue = await client.Issue.Get("ucdavis", "FeedbackBot", issueIDInt);
             var newIssueContainer = new issuesContainer();
-            newIssueContainer.deserialize(issue, Globals.kerberos);
+            newIssueContainer.deserialize(issue);
 
             // Getting all comments in the issue
             var issueComments = await client.Issue.Comment.GetAllForIssue("ucdavis", "FeedbackBot", issueIDInt);
@@ -201,7 +207,7 @@ namespace FeedbackBot.Controllers
                 return returnBody;
             }
 
-            public void deserialize(Octokit.Issue issue, string kerberos)
+            public void deserialize(Octokit.Issue issue)
             {
                 // Issue body, title, and issue number
                 var issueBody = issue.Body;
@@ -223,7 +229,7 @@ namespace FeedbackBot.Controllers
                 this.stringOfVoters = issueBody.Substring(indexOfVoters + 7);
                 this.listOfVoters = this.stringOfVoters.Split(',').Select(d => d.Trim()).ToList();
 
-                if (issueBody.IndexOf(kerberos) > 0)
+                if (issueBody.IndexOf(Globals.kerberos) > 0)
                 {
                     voteState = "unvote";
                 } else
