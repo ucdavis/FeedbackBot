@@ -27,7 +27,7 @@
                     @using (Html.BeginForm("vote", "Home"))
                     {
                         <input type="text" class="voteID" name="voteID" value="@issue.number" style="display:none;" /><br />
-                        <input type="submit" value="Vote" id="@issue.number" />
+                        <input type="submit" value="@issue.voteState" id="@issue.number" />
                     }
                     </div>
                 </div>
@@ -35,8 +35,9 @@
                     <p class="title">@issue.title</p>
                     <div class="description">
                         <span>@issue.body</span><br />
-                        <span>@issue.listOfVoters</span>
+                        <span><b>Voters: </b>@issue.stringOfVoters</span>
                     </div>
+                    <div><a href="/issues/@issue.number">View Comments</a></div>
                 </div>
             </div>
         }
