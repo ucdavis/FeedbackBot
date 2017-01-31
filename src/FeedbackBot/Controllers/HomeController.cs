@@ -114,6 +114,55 @@ namespace FeedbackBot.Controllers
             return RedirectToAction("index");
         }
 
+        [HttpGet("/issues/{id}")]
+        public async Task<IActionResult> Details(string id)
+        {
+            int issueIDInt = Int32.Parse(id);
+
+            // Github Authentication
+            var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
+            var basicAuth = new Credentials("UCDFeedbackBot", "99LinesOfCode"); // NOTE: not real credentials
+            client.Credentials = basicAuth;
+            var kerberos = User.Identity.Name;
+
+            var issue = await client.Issue.Get("ucdavis", "FeedbackBot", issueIDInt);
+            var newIssueContainer = new issuesContainer();
+            newIssueContainer.kerberos = kerberos;
+            newIssueContainer.deserialize(issue);
+
+            var issueComments = await client.Issue.Comment.GetAllForIssue("ucdavis", "FeedbackBot", issueIDInt);
+            var listOfComments = new List<commentContainer>();
+
+            foreach (IssueComment i in issueComments)
+            {
+                var commentContainer = new commentContainer();
+                var indexOfLine = i.Body.IndexOf("--------------------");
+                commentContainer.body = i.Body.Substring(0, indexOfLine);
+                var indexOfAuthor = i.Body.IndexOf("Author:");
+                commentContainer.author = i.Body.Substring(indexOfAuthor + 7);
+
+                listOfComments.Add(commentContainer);
+            }
+
+            var issuesView = new issueDetailsViewModel();
+            issuesView.comments = listOfComments;
+            issuesView.issue = newIssueContainer;
+
+            return View(issuesView);
+        }
+
+        public class issueDetailsViewModel
+        {
+            public issuesContainer issue { get; set; }
+            public List<commentContainer> comments { get; set; }
+        }
+
+        public class commentContainer
+        {
+            public string body { get; set; }
+            public string author { get; set; }
+        }
+
         public class issuesContainer {
             public string title { get; set; }
             public string numOfVotes { get; set; }

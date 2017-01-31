@@ -1,0 +1,59 @@
+﻿@model FeedbackBot.Controllers.HomeController.issueDetailsViewModel
+
+@{
+    ViewData["Title"] = "Issue";
+}
+<h3>@ViewData["Message"]</h3>
+<br />
+<div id="newIssueBox">
+    <div class="issueCard">
+        <div class="leftCard">
+            <div class="voteBox">
+                <p>@Model.issue.numOfVotes</p>
+
+            </div>
+            <div class="voteButton">
+                @using (Html.BeginForm("vote", "Home"))
+                {
+                    <input type="text" class="voteID" name="voteID" value="@Model.issue.number" style="display:none;" /><br />
+                    <input type="submit" value="@Model.issue.voteState" id="@Model.issue.number" />
+                }
+            </div>
+        </div>
+        <div class="rightCard">
+            <p class="title">@Model.issue.title</p>
+            <div class="description">
+                <span>@Model.issue.body</span><br />
+                <span><b>Voters: </b>@Model.issue.stringOfVoters</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="newIssueBox">
+    <h4>Submit New Comment</h4><br /><br />
+
+    <div class="issueCard">
+
+        @using (Html.BeginForm("createIssue", "Home"))
+        {
+            <b>Title:</b><input type="text" name="title" /><br />
+            <b>Description:</b><input id="descriptionTextBox" type="text" name="description" /><br />
+            <input type="submit" />
+        }
+    </div>
+</div>
+
+
+   @foreach (var issue in Model.comments)
+   {
+    <div id="newIssueBox">
+        <div class="issueCard">
+            <div class="rightCard">
+                <div><b>Comment: </b>@issue.body</div><br />
+                <div><b>Author: </b>@issue.author</div><br /><br />
+            </div>
+         </div>
+    </div>
+    }
+<br />
