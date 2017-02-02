@@ -11,15 +11,30 @@ namespace FeedbackBot.Controllers
 {
     [Authorize(ActiveAuthenticationSchemes = "ucdcas")]
     public class HomeController : Controller
-    {  
+    {
+        public GitHubClient client;
+        public string kerberos;
+
+        public HomeController()
+        {
+            client = initialize();
+        }
+
+        public string getKerberos()
+        {
+            return User.Identity.Name;
+        }
+
+        public GitHubClient initialize()
+        {
+            var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
+            var basicAuth = new Credentials("UCDFeedbackBot", "99LinesOfCode");
+            client.Credentials = basicAuth;
+            return client;
+        }
+
         public async Task<IActionResult> Index()
         {
-            // Github Authentication
-            var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            var basicAuth = new Credentials("UCDFeedbackBot", "99LinesOfCode"); 
-            client.Credentials = basicAuth;
-            var kerberos = User.Identity.Name;
-
             // Filters: Created by User, Labels "feedback", and default set to only open feedback issues
             var recently = new IssueRequest
             {
@@ -33,8 +48,15 @@ namespace FeedbackBot.Controllers
             foreach (Issue i in issues)
             {
                 var newIssueContainer = new issuesContainer();
-                newIssueContainer.kerberos = kerberos;
                 newIssueContainer.deserialize(i);
+                if (newIssueContainer.stringOfVoters.IndexOf(getKerberos()) > 0)
+                {
+                    newIssueContainer.voteState = "unvote";
+                }
+                else
+                {
+                    newIssueContainer.voteState = "vote";
+                }
                 issueContainerList.Add(newIssueContainer);
             }
             ViewData["Message"] = "Current Feedback";
@@ -49,20 +71,24 @@ namespace FeedbackBot.Controllers
         [HttpPost("createIssue")]
         public async Task<ActionResult> CreateIssue(string title, string description)
         {
-            // Github Authentication
-            var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            var basicAuth = new Credentials("UCDFeedbackBot", "99LinesOfCode"); 
-            client.Credentials = basicAuth;
-            var kerberos = User.Identity.Name;
-
             // Initialize new issue
             var createIssue = new NewIssue(title)
             {
-                Body = description + "\r\n--------------------\r\nVotes: 1\r\nVoters: " + kerberos,
+                Body = string.Format("{0}\r\n--------------------\r\nVotes: 1\r\nVoters: {1}", description, getKerberos()),
                 Labels = { "feedback" }
             };
             var issue = await client.Issue.Create("ucdavis", "FeedbackBot", createIssue);
             return RedirectToAction("index");
+        }
+
+        [HttpPost("addComment")]
+        public async Task<ActionResult> AddComment(string comment, string voteID)
+        {
+            int issueIDInt = Int32.Parse(voteID);
+            comment = string.Format("{0} \r\n--------------------\r\nAuthor: {1}", comment, getKerberos());
+            var issue = await client.Issue.Get("ucdavis", "FeedbackBot", issueIDInt);
+            var addComment = await client.Issue.Comment.Create("ucdavis", "FeedbackBot", issueIDInt, comment);
+            return Redirect("/issues/" + voteID);
         }
 
         /*
@@ -74,15 +100,8 @@ namespace FeedbackBot.Controllers
         {
             int issueIDInt = Int32.Parse(voteID);
 
-            // Github Authentication
-            var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            var basicAuth = new Credentials("UCDFeedbackBot", "99LinesOfCode"); // NOTE: not real credentials
-            client.Credentials = basicAuth;
-            var kerberos = User.Identity.Name;
-
             var issue = await client.Issue.Get("ucdavis", "FeedbackBot", issueIDInt);
             var newIssueContainer = new issuesContainer();
-            newIssueContainer.kerberos = kerberos;
             newIssueContainer.deserialize(issue);
 
             if (newIssueContainer.voteState == "unvote")
@@ -91,8 +110,7 @@ namespace FeedbackBot.Controllers
                 newIssueContainer.numOfVotesInt = newVoteCount;
                 newIssueContainer.numOfVotes = newVoteCount.ToString();
 
-                newIssueContainer.listOfVoters.Remove(kerberos);
-                newIssueContainer.stringOfVoters = string.Join(",", newIssueContainer.listOfVoters.ToArray()).Trim().TrimStart(',');
+                newIssueContainer.listOfVoters.Remove(getKerberos());
             }
             else
             {
@@ -100,9 +118,9 @@ namespace FeedbackBot.Controllers
                 int newVoteCount = newIssueContainer.numOfVotesInt + 1;
                 newIssueContainer.numOfVotesInt = newVoteCount;
                 newIssueContainer.numOfVotes = newVoteCount.ToString();
-                newIssueContainer.listOfVoters.Add(kerberos);
-                newIssueContainer.stringOfVoters = string.Join(", ", newIssueContainer.listOfVoters.ToArray()).Trim().TrimStart(',');
+                newIssueContainer.listOfVoters.Add(getKerberos());
             }
+            newIssueContainer.stringOfVoters = string.Join(",", newIssueContainer.listOfVoters.ToArray()).Trim().TrimStart(',');
 
             // Update issue on GitHub
             var update = issue.ToUpdate();
@@ -110,40 +128,34 @@ namespace FeedbackBot.Controllers
             await client.Issue.Update("ucdavis", "FeedbackBot", issueIDInt, update);
 
             //Update voters
-
             return RedirectToAction("index");
         }
 
+        /*
+         * Displays the details of an issue along with all its comments
+         * @param string voteID - The number of the issue we are upvoting
+         */
         [HttpGet("/issues/{id}")]
         public async Task<IActionResult> Details(string id)
         {
             int issueIDInt = Int32.Parse(id);
 
-            // Github Authentication
-            var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            var basicAuth = new Credentials("UCDFeedbackBot", "99LinesOfCode"); // NOTE: not real credentials
-            client.Credentials = basicAuth;
-            var kerberos = User.Identity.Name;
-
+            // Getting issue
             var issue = await client.Issue.Get("ucdavis", "FeedbackBot", issueIDInt);
             var newIssueContainer = new issuesContainer();
-            newIssueContainer.kerberos = kerberos;
             newIssueContainer.deserialize(issue);
 
+            // Getting all comments in the issue
             var issueComments = await client.Issue.Comment.GetAllForIssue("ucdavis", "FeedbackBot", issueIDInt);
             var listOfComments = new List<commentContainer>();
-
             foreach (IssueComment i in issueComments)
             {
                 var commentContainer = new commentContainer();
-                var indexOfLine = i.Body.IndexOf("--------------------");
-                commentContainer.body = i.Body.Substring(0, indexOfLine);
-                var indexOfAuthor = i.Body.IndexOf("Author:");
-                commentContainer.author = i.Body.Substring(indexOfAuthor + 7);
-
+                commentContainer.deserialize(i);
                 listOfComments.Add(commentContainer);
             }
 
+            // Update model view
             var issuesView = new issueDetailsViewModel();
             issuesView.comments = listOfComments;
             issuesView.issue = newIssueContainer;
@@ -161,6 +173,16 @@ namespace FeedbackBot.Controllers
         {
             public string body { get; set; }
             public string author { get; set; }
+            public string createDate { get; set; }
+
+            public void deserialize(Octokit.IssueComment comment)
+            {
+                var indexOfLine = comment.Body.IndexOf("--------------------");
+                this.body = comment.Body.Substring(0, indexOfLine);
+                var indexOfAuthor = comment.Body.IndexOf("Author:");
+                this.author = comment.Body.Substring(indexOfAuthor + 7);
+                this.createDate = comment.CreatedAt.ToString().Remove(9);
+            }
         }
 
         public class issuesContainer {
@@ -177,7 +199,7 @@ namespace FeedbackBot.Controllers
             // Returns string of description for GitHub issue body
             public string serialize()
             {
-                var returnBody = this.body + "\r\n--------------------\r\nVotes: " + numOfVotes + "\r\nVoters: " + stringOfVoters;
+                var returnBody = string.Format("{0}\r\n--------------------\r\nVotes: {1}\r\nVoters: {2}", this.body, numOfVotes, stringOfVoters);
                 return returnBody;
             }
 
@@ -202,14 +224,6 @@ namespace FeedbackBot.Controllers
                 var indexOfVoters = issueBody.IndexOf("Voters:");
                 this.stringOfVoters = issueBody.Substring(indexOfVoters + 7);
                 this.listOfVoters = this.stringOfVoters.Split(',').Select(d => d.Trim()).ToList();
-
-                if (issueBody.IndexOf(kerberos) > 0)
-                {
-                    voteState = "unvote";
-                } else
-                {
-                    voteState = "vote";
-                }
             }
         }
 

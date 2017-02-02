@@ -31,15 +31,13 @@
 </div>
 
 <div id="newIssueBox">
-    <h4>Submit New Comment</h4><br /><br />
-
+    <h4>Submit New Comment</h4><br />
     <div class="issueCard">
-
-        @using (Html.BeginForm("createIssue", "Home"))
+        @using (Html.BeginForm("addComment", "Home"))
         {
-            <b>Title:</b><input type="text" name="title" /><br />
-            <b>Description:</b><input id="descriptionTextBox" type="text" name="description" /><br />
-            <input type="submit" />
+            <b>Comment:</b><input type="text" name="comment" /><br />
+            <input type="text" class="voteID" name="voteID" value="@Model.issue.number" style="display:none;" /><br />
+            <input type="submit" id="@Model.issue.number"/>
         }
     </div>
 </div>
@@ -50,6 +48,7 @@
     <div id="newIssueBox">
         <div class="issueCard">
             <div class="rightCard">
+                <div><b>Date Created: </b> @issue.createDate</div><br />
                 <div><b>Comment: </b>@issue.body</div><br />
                 <div><b>Author: </b>@issue.author</div><br /><br />
             </div>
