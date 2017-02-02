@@ -49,6 +49,7 @@ namespace FeedbackBot.Controllers
             {
                 var newIssueContainer = new issuesContainer();
                 newIssueContainer.deserialize(i);
+                if (newIssueContainer.stringOfVoters.IndexOf(getKerberos()) > 0)
                 {
                     newIssueContainer.voteState = "unvote";
                 }
