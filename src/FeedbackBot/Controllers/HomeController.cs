@@ -32,8 +32,7 @@ namespace FeedbackBot.Controllers
         public GitHubClient initialize()
         {
             var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            var basicAuth = new Credentials("UCDFeedbackBot", "99LinesOfCode");
-            var pw = _appSettings.GitHubPW;
+            var basicAuth = new Credentials("UCDFeedbackBot", _appSettings.GitHubPW);
             client.Credentials = basicAuth;
             return client;
         }
@@ -47,7 +46,6 @@ namespace FeedbackBot.Controllers
                 Labels = { "feedback" }
             };
             var issues = await client.Issue.GetAllForCurrent(recently);
-            var pw = _appSettings.GitHubPW;
             // List out all the current issues
             List<issuesContainer> issueContainerList = new List<issuesContainer>();
             foreach (Issue i in issues)
