@@ -6,17 +6,21 @@ using Microsoft.AspNetCore.Mvc;
 using Octokit;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
 
 namespace FeedbackBot.Controllers
 {
     [Authorize(ActiveAuthenticationSchemes = "ucdcas")]
     public class HomeController : Controller
     {
+        private readonly AppSettings _appSettings;
+
         public GitHubClient client;
         public string kerberos;
 
-        public HomeController()
+        public HomeController(IOptions<AppSettings> appSettings)
         {
+            _appSettings = appSettings.Value;
             client = initialize();
         }
 
@@ -28,7 +32,7 @@ namespace FeedbackBot.Controllers
         public GitHubClient initialize()
         {
             var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            var basicAuth = new Credentials("UCDFeedbackBot", "99LinesOfCode");
+            var basicAuth = new Credentials("UCDFeedbackBot", _appSettings.GitHubPW);
             client.Credentials = basicAuth;
             return client;
         }
@@ -42,21 +46,13 @@ namespace FeedbackBot.Controllers
                 Labels = { "feedback" }
             };
             var issues = await client.Issue.GetAllForCurrent(recently);
-
             // List out all the current issues
             List<issuesContainer> issueContainerList = new List<issuesContainer>();
             foreach (Issue i in issues)
             {
                 var newIssueContainer = new issuesContainer();
+                newIssueContainer.kerberos = getKerberos();
                 newIssueContainer.deserialize(i);
-                if (newIssueContainer.stringOfVoters.IndexOf(getKerberos()) > 0)
-                {
-                    newIssueContainer.voteState = "unvote";
-                }
-                else
-                {
-                    newIssueContainer.voteState = "vote";
-                }
                 issueContainerList.Add(newIssueContainer);
             }
             ViewData["Message"] = "Current Feedback";
@@ -102,6 +98,7 @@ namespace FeedbackBot.Controllers
 
             var issue = await client.Issue.Get("ucdavis", "FeedbackBot", issueIDInt);
             var newIssueContainer = new issuesContainer();
+            newIssueContainer.kerberos = getKerberos();
             newIssueContainer.deserialize(issue);
 
             if (newIssueContainer.voteState == "unvote")
@@ -109,7 +106,6 @@ namespace FeedbackBot.Controllers
                 int newVoteCount = newIssueContainer.numOfVotesInt - 1;
                 newIssueContainer.numOfVotesInt = newVoteCount;
                 newIssueContainer.numOfVotes = newVoteCount.ToString();
-
                 newIssueContainer.listOfVoters.Remove(getKerberos());
             }
             else
@@ -143,6 +139,7 @@ namespace FeedbackBot.Controllers
             // Getting issue
             var issue = await client.Issue.Get("ucdavis", "FeedbackBot", issueIDInt);
             var newIssueContainer = new issuesContainer();
+            newIssueContainer.kerberos = getKerberos();
             newIssueContainer.deserialize(issue);
 
             // Getting all comments in the issue
@@ -224,6 +221,15 @@ namespace FeedbackBot.Controllers
                 var indexOfVoters = issueBody.IndexOf("Voters:");
                 this.stringOfVoters = issueBody.Substring(indexOfVoters + 7);
                 this.listOfVoters = this.stringOfVoters.Split(',').Select(d => d.Trim()).ToList();
+
+                if (this.stringOfVoters.IndexOf(this.kerberos) > 0)
+                {
+                    this.voteState = "unvote";
+                }
+                else
+                {
+                    this.voteState = "vote";
+                }
             }
         }
 
