@@ -7,10 +7,12 @@
 <div>
     <div id="newIssueBox" >
         <h4>Submit New Feedback</h4>
-        @using (Html.BeginForm("createIssue", "Home"))
+        @using (Html.BeginForm("createIssue", "Home", 
+            new { appName = @ViewData["AppName"] }))
         {
             <b>Title:</b><input type="text" name="title" /><br />
             <b>Description:</b><input id="descriptionTextBox" type="text" name="description" /><br />
+            <input type="text" name="appName" value="@ViewData["AppName"]" style="display:none;" /><br />
             <input type="submit" />
         }
     </div>
@@ -21,12 +23,12 @@
                 <div class="leftCard">
                     <div class="voteBox">
                         <p>@issue.numOfVotes</p>
-
                     </div>
                     <div class="voteButton">
                     @using (Html.BeginForm("vote", "Home"))
                     {
-                        <input type="text" class="voteID" name="voteID" value="@issue.number" style="display:none;" /><br />
+                        <input type="text" class="voteID" name="voteID" value="@issue.number" style="display:none;" />
+                        <input type="text" name="appName" value="@ViewData["AppName"]" style="display:none;" />
                         <input type="submit" value="@issue.voteState" id="@issue.number" />
                     }
                     </div>
@@ -37,7 +39,7 @@
                         <span>@issue.body</span><br />
                         <span><b>Voters: </b>@issue.stringOfVoters</span>
                     </div>
-                    <div><a href="/issues/@issue.number">View Comments</a></div>
+                    <div><a href="/issues/@ViewData["AppName"]/@issue.number">View Comments</a></div>
                 </div>
             </div>
         }
