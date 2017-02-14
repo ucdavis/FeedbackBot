@@ -66,6 +66,7 @@ namespace FeedbackBot.Controllers
                 Labels = { "feedback" }
             };
             var issues = await client.Issue.GetAllForRepository("ucdavis", _appName);
+
             // List out all the current issues
             List<issuesContainer> issueContainerList = new List<issuesContainer>();
             foreach (Issue i in issues)
