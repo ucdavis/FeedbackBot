@@ -1,44 +1,9 @@
-﻿@model IReadOnlyList<FeedbackBot.Controllers.HomeController.issuesContainer>
-    @{
-        ViewData["Title"] = "Home Page";
-        <h3>@ViewData["Message"]</h3>
-    }
+﻿@{
+    ViewData["Title"] = "Welcome";
+}
+<h2>@ViewData["Title"].</h2>
+<h3>@ViewData["Message"]</h3>
 
-<div>
-    <div id="newIssueBox" >
-        <h4>Submit New Feedback</h4>
-        @using (Html.BeginForm("createIssue", "Home"))
-        {
-            <b>Title:</b><input type="text" name="title" /><br />
-            <b>Description:</b><input id="descriptionTextBox" type="text" name="description" /><br />
-            <input type="submit" />
-        }
-    </div>
+<p>This is the landing page for the feedback bot if you the user hasn't input app queries.</p>
 
-        @foreach (var issue in Model)
-        {
-            <div class="issueCard">
-                <div class="leftCard">
-                    <div class="voteBox">
-                        <p>@issue.numOfVotes</p>
-
-                    </div>
-                    <div class="voteButton">
-                    @using (Html.BeginForm("vote", "Home"))
-                    {
-                        <input type="text" class="voteID" name="voteID" value="@issue.number" style="display:none;" /><br />
-                        <input type="submit" value="@issue.voteState" id="@issue.number" />
-                    }
-                    </div>
-                </div>
-                <div class="rightCard">
-                    <p class="title">@issue.title</p>
-                    <div class="description">
-                        <span>@issue.body</span><br />
-                        <span><b>Voters: </b>@issue.stringOfVoters</span>
-                    </div>
-                    <div><a href="/issues/@issue.number">View Comments</a></div>
-                </div>
-            </div>
-        }
-</div>
+    
