@@ -54,11 +54,7 @@ namespace FeedbackBot.Controllers
                 Filter = IssueFilter.Created,
                 Labels = { "feedback" }
             };
-<<<<<<< HEAD
             var issues = await client.Issue.GetAllForRepository("ucdavis", appName, recently);
-=======
-            var issues = await client.Issue.GetAllForRepository("ucdavis", _appName);
->>>>>>> origin/secrets
 
             // List out all the current issues
             List<issuesContainer> issueContainerList = new List<issuesContainer>();
