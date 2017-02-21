@@ -1,4 +1,4 @@
-﻿namespace FeedbackBot
+namespace FeedbackBot
 {
     public class AppSettings
     {
