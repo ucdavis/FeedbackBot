@@ -39,33 +39,23 @@ namespace FeedbackBot.Controllers
             return client;
         }
 
-        public async Task<IActionResult> Index(object sender, EventArgs e)
+        public IActionResult Index()
         {
-            var appName = "";
-            var queryStrings = Request.Query;
-            var keys = queryStrings.Keys;
-            var qsList = new Dictionary<string, string>();
-            foreach (var key in queryStrings.Keys)
-            {
-                qsList.Add(key, queryStrings[key]);
-            }
-            if (qsList.ContainsKey("app"))
-            {
-                appName = qsList["app"];
-                this._appName = appName;
-            }
-            else
-            {
-                return RedirectToAction("About");
-            }
+            ViewData["Message"] = "Welcome";
+            return View();
+        }
 
+        [HttpGet("/app/{appName}")]
+        public async Task<IActionResult> app(string appName)
+        {
             // Filters: Created by User, Labels "feedback", and default set to only open feedback issues
-            var recently = new IssueRequest
+            var recently = new RepositoryIssueRequest
             {
                 Filter = IssueFilter.Created,
                 Labels = { "feedback" }
             };
-            var issues = await client.Issue.GetAllForRepository("ucdavis", _appName);
+            var issues = await client.Issue.GetAllForRepository("ucdavis", appName, recently);
+
             // List out all the current issues
             List<issuesContainer> issueContainerList = new List<issuesContainer>();
             foreach (Issue i in issues)
@@ -79,7 +69,7 @@ namespace FeedbackBot.Controllers
             ViewData["Message"] = "Current Feedback for " + appName;
             return View(issueContainerList);
         }
-        
+
         /*
          * Creates a new issue in FeedbackBot repository
          * @param string title - The title of the feedback [required]
