@@ -81,7 +81,7 @@ namespace FeedbackBot.Controllers
             // Initialize new issue
             var createIssue = new NewIssue(title)
             {
-                Body = string.Format("{0}\r\n--------------------\r\nVotes: 1\r\nVoters: {1}", description, getKerberos()),
+                Body = string.Format("{0}\r\n--------------------\r\nVotes: 1\r\nAuthor:{1}\r\nVoters: {2}", description, getKerberos(), getKerberos()),
                 Labels = { "feedback" }
             };
             var issue = await client.Issue.Create("ucdavis", appName, createIssue);
@@ -204,11 +204,12 @@ namespace FeedbackBot.Controllers
             public int number { get; set; }
             public string voteState { get; set; }
             public string kerberos { get; set; }
+            public string author { get; set;  }
 
             // Returns string of description for GitHub issue body
             public string serialize()
             {
-                var returnBody = string.Format("{0}\r\n--------------------\r\nVotes: {1}\r\nVoters: {2}", this.body, numOfVotes, stringOfVoters);
+                var returnBody = string.Format("{0}\r\n--------------------\r\nVotes: {1}\r\nAuthor: {2}\r\nVoters: {3}", body, numOfVotes, author, stringOfVoters);
                 return returnBody;
             }
 
@@ -220,10 +221,15 @@ namespace FeedbackBot.Controllers
                 this.number = issue.Number;
 
                 // Votes
-                var stringPattern = "(?<=Votes: )[0-9]+";
-                Match m = Regex.Match(issueBody, stringPattern);
-                this.numOfVotes = m.Value;
+                var votesStringPattern = "(?<=Votes: )[0-9]+";
+                Match votesText = Regex.Match(issueBody, votesStringPattern);
+                this.numOfVotes = votesText.Value;
                 this.numOfVotesInt = int.Parse(numOfVotes);
+
+                //Author
+                var authorStringPattern = "(?<=Author: )[a-zA-Z]+";
+                Match authorText = Regex.Match(issueBody, authorStringPattern);
+                this.author = authorText.Value;
 
                 // Feedback
                 var indexOfLine = issueBody.IndexOf("--------------------");
