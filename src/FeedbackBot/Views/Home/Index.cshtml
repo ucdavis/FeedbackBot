@@ -1,17 +1,19 @@
-﻿@model IReadOnlyList<FeedbackBot.Controllers.HomeController.issuesContainer>
+﻿<div class="bodyDiv">
+@model IReadOnlyList<FeedbackBot.Controllers.HomeController.issuesContainer>
     @{
         ViewData["Title"] = "Home Page";
-        <h3>@ViewData["Message"]</h3>
+        <h3 class="pageTitle">@ViewData["Message"]</h3>
     }
-
-<div>
     <div id="newIssueBox" >
-        <h4>Submit New Feedback</h4>
         @using (Html.BeginForm("createIssue", "Home"))
         {
-            <b>Title:</b><input type="text" name="title" /><br />
-            <b>Description:</b><input id="descriptionTextBox" type="text" name="description" /><br />
-            <input type="submit" />
+            <div class="user">
+              <img class = "user_photo" src="media/empty_user.png">
+              <p class = "user_name">Cal Doval </p>
+            </div>
+            <input type="text" id="title-input" placeholder="Title" name="title" />
+            <textarea placeholder="Type your feedback here" id="descriptionTextBox" type="text" name="description"></textarea> <br>
+            <button type="submit">Submit</button>
         }
     </div>
 
@@ -19,25 +21,35 @@
         {
             <div class="issueCard">
                 <div class="leftCard">
-                    <div class="voteBox">
-                        <p>@issue.numOfVotes</p>
-
+                  <img class= "leftCols"  src="~/media/lefthand.svg" alt="">
+                </div>
+                <div class="rightCard">
+                    <h3 class="title">@issue.title</h3>
+                    <div class="user">
+                      <img class = "user_photo" src="media/empty_user.png">
+                      <div class="userWritten">
+                      <p class = "user_name">Cal Doval </p>
+                      <p>Written 10 hours ago </p>
+                      </div>
                     </div>
+                    <div class="description">
+                        <span>@issue.body</span><br />
+                    </div>
+                    <span style="margin-left: 10px;"><b>Upvoted by:</b></span>
+                    <span style="margin-left: 10px;">@issue.stringOfVoters</span>
+
+                    <div class="vote">
                     <div class="voteButton">
                     @using (Html.BeginForm("vote", "Home"))
                     {
-                        <input type="text" class="voteID" name="voteID" value="@issue.number" style="display:none;" /><br />
-                        <input type="submit" value="@issue.voteState" id="@issue.number" />
+                        <input type="text" class="voteID" name="voteID" value="@issue.number" style="display:none;" />
+                        <input type="submit" class="buttonID" value="@issue.voteState" id="@issue.number" />
                     }
+                    <p class="voteNum"> | </p>
+                    <p class="voteNum">@issue.numOfVotes</p>
                     </div>
-                </div>
-                <div class="rightCard">
-                    <p class="title">@issue.title</p>
-                    <div class="description">
-                        <span>@issue.body</span><br />
-                        <span><b>Voters: </b>@issue.stringOfVoters</span>
+                    <a class="goComments" href="/issues/@issue.number">comments</a>
                     </div>
-                    <div><a href="/issues/@issue.number">View Comments</a></div>
                 </div>
             </div>
         }

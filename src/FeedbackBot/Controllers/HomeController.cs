@@ -55,10 +55,10 @@ namespace FeedbackBot.Controllers
                 newIssueContainer.deserialize(i);
                 issueContainerList.Add(newIssueContainer);
             }
-            ViewData["Message"] = "Current Feedback";
+            ViewData["Message"] = "Hi, submit a new feedback";
             return View(issueContainerList);
         }
-        
+
         /*
          * Creates a new issue in FeedbackBot repository
          * @param string title - The title of the feedback [required]

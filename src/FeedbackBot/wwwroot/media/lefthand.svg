@@ -1,0 +1,17 @@
+<svg width="19" height="198" viewBox="0 0 19 198" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:figma="http://www.figma.com/figma/ns">
+<title>Component</title>
+<desc>Created using Figma</desc>
+<g id="Canvas" transform="translate(178 -2832)" figma:type="canvas">
+<g id="Component" style="mix-blend-mode:normal;" figma:type="symbol">
+<g id="Rectangle" style="mix-blend-mode:normal;" figma:type="rounded-rectangle">
+<use xlink:href="#path0_fill" transform="matrix(2.37244e-16 1 -1 4.26699e-17 -159.279 2832.36)" fill="#C99818" fill-opacity="0.33" style="mix-blend-mode:normal;"/>
+</g>
+<g id="Rectangle" style="mix-blend-mode:normal;" figma:type="rounded-rectangle">
+<use xlink:href="#path0_fill" transform="matrix(3.4664e-16 1 -1 2.92037e-17 -172.809 2878.29)" fill="#C99818" fill-opacity="0.33" style="mix-blend-mode:normal;"/>
+</g>
+</g>
+</g>
+<defs>
+<path id="path0_fill" d="M 0 0L 151.415 0L 151.415 5.19065L 0 5.19065L 0 0Z"/>
+</defs>
+</svg>
