@@ -81,11 +81,11 @@ namespace FeedbackBot.Controllers
             // Initialize new issue
             var createIssue = new NewIssue(title)
             {
-                Body = string.Format("{0}\r\n--------------------\r\nVotes: 1\r\nAuthor:{1}\r\nVoters: {2}", description, getKerberos(), getKerberos()),
+                Body = string.Format("{0}\r\n--------------------\r\nVotes: 1\r\nAuthor: {1}\r\nVoters: {2}", description, getKerberos(), getKerberos()),
                 Labels = { "feedback" }
             };
             var issue = await client.Issue.Create("ucdavis", appName, createIssue);
-            return RedirectToAction("index", "home", new { app = appName });
+            return RedirectToAction("details", "home", new { app = appName });
         }
 
         [HttpPost("addComment")]
