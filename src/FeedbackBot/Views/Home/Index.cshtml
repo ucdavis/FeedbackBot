@@ -21,24 +21,27 @@
         {
             <div class="issueCard">
                 <div class="leftCard">
-                  <img class= "leftCols"  src="~/media/lefthand.svg" alt="">
+                  <!-- <img class= "leftCols"  src="~/media/lefthand.svg" alt=""> -->
                 </div>
                 <div class="rightCard">
                     <h3 class="title">@issue.title</h3>
-                    <div class="user">
-                      <img class = "user_photo" src="media/empty_user.png">
-                      <div class="userWritten">
-                      <p class = "user_name">Cal Doval </p>
-                      <p>Written 10 hours ago </p>
+                    <div class="border-wrap">
+                      <div class="description">
+                      <div class="user">
+                        <img class = "user_photo" src="media/empty_user.png">
+                        <div class="userWritten">
+                          <p class = "user_name">Cal Doval </p>
+                          <p>Written 10 hours ago </p>
+                        </div>
                       </div>
-                    </div>
-                    <div class="description">
+                      </div>
                         <span>@issue.body</span><br />
-                    </div>
-                    <span style="margin-left: 10px;"><b>Upvoted by:</b></span>
-                    <span style="margin-left: 10px;">@issue.stringOfVoters</span>
+                      </div>
 
                     <div class="vote">
+                    <p><b>Upvoted by:</b>
+                    @issue.stringOfVoters</p>
+
                     <div class="voteButton">
                     @using (Html.BeginForm("vote", "Home"))
                     {
