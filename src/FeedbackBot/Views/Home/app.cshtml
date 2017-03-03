@@ -1,49 +1,63 @@
-﻿
-
+<div class="bodyDiv">
 @model IReadOnlyList<FeedbackBot.Controllers.HomeController.issuesContainer>
-@{
-    ViewData["Title"] = "Home Page";
-    <h3>@ViewData["Message"]</h3>
-}
-
-<div>
-    <div id="newIssueBox">
-        <h4>Submit New Feedback</h4>
+    @{
+        ViewData["Title"] = "Home Page";
+        <h3 class="pageTitle">@ViewData["Message"]</h3>
+    }
+    <div id="newIssueBox" >
         @using (Html.BeginForm("createIssue", "Home",
                         new { appName = @ViewData["AppName"] }))
         {
-            <b>Title:</b><input type="text" name="title" /><br />
-            <b>Description:</b><input id="descriptionTextBox" type="text" name="description" /><br />
+            <div class="user">
+              <img class = "user_photo" src="~/media/empty_user.png">
+              <p class = "user_name"></p>
+            </div>
+            <input type="text" id="title-input" placeholder="Title" name="title" />
+            <textarea placeholder="Type your feedback here" id="descriptionTextBox" type="text" name="description"></textarea>
             <input type="hidden" name="appName" value="@ViewData["AppName"]" style="display:none;" /><br />
-            <input type="submit" />
+ <br>
+            <button type="submit">Submit</button>
         }
     </div>
 
-    @foreach (var issue in Model)
-    {
-        <div class="issueCard">
-            <div class="leftCard">
-                <div class="voteBox">
-                    <p>@issue.numOfVotes</p>
+        @foreach (var issue in Model)
+        {
+            <div class="issueCard">
+                <div class="leftCard">
+                  <!-- <img class= "leftCols"  src="~/media/lefthand.svg" alt=""> -->
                 </div>
-                <div class="voteButton">
+                <div class="rightCard">
+                    <h3 class="title">@issue.title</h3>
+                    <div class="border-wrap">
+                      <div class="  description">
+                      <div class="user">
+                        <img class = "user_photo" src="~/media/empty_user.png">
+                        <div class="userWritten">
+                          <p class = "user_name">@issue.author</p>
+                          <p>Written 10 hours ago </p>
+                        </div>
+                      </div>
+                      </div>
+                        <span>@issue.body</span><br />
+                      </div>
+
+                    <div class="vote">
+                    <p><b>Upvoted by:</b>
+                    @issue.stringOfVoters</p>
+
+                    <div class="voteButton">
                     @using (Html.BeginForm("vote", "Home"))
                     {
-                        <input class="voteID" name="voteID" value="@issue.number" type="hidden" />
-                        <input name="appName" value="@ViewData["AppName"]" type="hidden" />
-                        <input type="submit" value="@issue.voteState" id="@issue.number" />
+                    <input class="voteID" name="voteID" value="@issue.number" type="hidden" />
+                    <input name="appName" value="@ViewData["AppName"]" type="hidden" />
+                    <input type="submit" class="buttonID" value="@issue.voteState" id="@issue.number" />
                     }
+                    <p class="voteNum"> | </p>
+                    <p class="voteNum">@issue.numOfVotes</p>
+                    </div>
+                    <a href="/issues/@ViewData["AppName"]/@issue.number">comments</a>
+                    </div>
                 </div>
             </div>
-            <div class="rightCard">
-                <p class="title">@issue.title</p>
-                <div class="description">
-                    <span>@issue.body</span><br />
-                    <span><b>Author: </b>@issue.author</span><br />
-                    <span><b>Voters: </b>@issue.stringOfVoters</span>
-                </div>
-                <div><a href="/issues/@ViewData["AppName"]/@issue.number">View Comments</a></div>
-            </div>
-        </div>
-    }
+        }
 </div>

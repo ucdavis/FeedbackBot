@@ -101,6 +101,17 @@ body{padding-top:50px;padding-bottom:20px}.body-content{padding-left:15px;paddin
   padding-top: 8px;
 }
 
+#descriptionTextBoxComment {
+  width: 500px;
+  max-width: 100%;
+  height:200px;
+  font-size: 18px;
+  border: 1px solid rgb(218,218,218);
+  padding-left: 8px;
+  padding-top: 8px;
+}
+
+
 button {
     overflow:hidden;
     width:7rem;
@@ -198,13 +209,13 @@ button {
     border-bottom: 1px solid rgb(218,218,218) ;
     display: flex; /* or inline-flex */
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
     margin: 24px;
     margin-top: 0px;
     margin-bottom: 0px;
     padding: 15px;
     padding-top: 0px;
-    width:100%;
+    /*width:100%;*/
 }
 .voteBox {
     /*border: 1px solid black;*/
@@ -254,6 +265,20 @@ button {
     width: 600px;
 
 }
+
+.issueComment{
+  display: flex; /* or inline-flex */
+  flex-direction: row;
+  align-items: flex-start;
+  margin: 24px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding: 15px;
+  padding-top: 0px;
+
+}
+
+
 .border-wrap {
   border-left: 8px double #C99818;
   padding-left: 16px;
