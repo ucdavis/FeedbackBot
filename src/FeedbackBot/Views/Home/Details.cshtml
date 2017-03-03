@@ -1,60 +1,45 @@
-﻿@model FeedbackBot.Controllers.HomeController.issueDetailsViewModel
+@model FeedbackBot.Controllers.HomeController.issueDetailsViewModel
 
 @{
     ViewData["Title"] = "Issue";
 }
 <h3>@ViewData["Message"]</h3>
-
-
-
+<br />
 <div id="newIssueBox">
     <div class="issueCard">
-<div class="leftCard">
-  <!-- <img class= "leftCols"  src="~/media/lefthand.svg" alt=""> -->
-</div>
-<div class="rightCard">
-    <h3 class="title">@Model.issue.title</h3>
-    <div class="border-wrap">
-      <div class="description">
-      <div class="user">
-        <img class = "user_photo" src="media/empty_user.png">
-        <div class="userWritten">
-          <p class = "user_name">Cal Doval </p>
-          <p>Written 10 hours ago </p>
+        <div class="leftCard">
+            <div class="voteBox">
+                <p>@Model.issue.numOfVotes</p>
+
+            </div>
+            <div class="voteButton">
+                @using (Html.BeginForm("vote", "Home"))
+                {
+                    <input type="text" class="voteID" name="voteID" value="@Model.issue.number" style="display:none;" />
+                    <input type="text" name="appName" value="@ViewData["AppName"]" style="display:none;" />
+                    <input type="submit" value="@Model.issue.voteState" id="@Model.issue.number" />
+                }
+            </div>
         </div>
-      </div>
-      </div>
-        <span>@Model.issue.body</span><br />
-      </div>
-
-    <div class="vote">
-    <p><b>Upvoted by:</b>
-    @Model.issue.stringOfVoters</p>
-
-    <div class="voteButton">
-    @using (Html.BeginForm("vote", "Home"))
-    {
-        <input type="text" class="voteID" name="voteID" value="@Model.issue.number" style="display:none;" />
-        <input type="submit" class="buttonID" value="@Model.issue.voteState" id="@Model.issue.number" />
-    }
-    <p class="voteNum"> | </p>
-    <p class="voteNum">@Model.issue.numOfVotes</p>
-    </div>
-    <a class="goComments" href="/issues/@Model.issue.number">comments</a>
+        <div class="rightCard">
+            <p class="title">@Model.issue.title</p>
+            <div class="description">
+                <span>@Model.issue.body</span><br />
+                <span><b>Author: </b>@Model.issue.author</span><br />
+                <span><b>Voters: </b>@Model.issue.stringOfVoters</span>
+            </div>
+        </div>
     </div>
 </div>
-</div>
-</div>
 
-<div id="newCommentBox">
+<div id="newIssueBox">
     <h4>Submit New Comment</h4><br />
-    <div class="commentCard">
+    <div class="issueCard">
         @using (Html.BeginForm("addComment", "Home"))
         {
-          <textarea placeholder="Type your comment here" id="descriptionTextBox" type="text" name="comment" value="@Model.issue.number"></textarea> <br>
-          <button type="submit" id="@Model.issue.number">Submit</button>
             <b>Comment:</b><input type="text" name="comment" /><br />
             <input type="text" class="voteID" name="voteID" value="@Model.issue.number" style="display:none;" /><br />
+            <input type="text" name="appName" value="@ViewData["AppName"]" style="display:none;" /><br />
             <input type="submit" id="@Model.issue.number"/>
         }
     </div>

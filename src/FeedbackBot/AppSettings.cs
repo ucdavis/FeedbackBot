@@ -1,4 +1,4 @@
-﻿namespace FeedbackBot.Controllers
+namespace FeedbackBot
 {
     public class AppSettings
     {

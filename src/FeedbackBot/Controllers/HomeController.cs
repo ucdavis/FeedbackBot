@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +7,7 @@ using Octokit;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Http;
 
 namespace FeedbackBot.Controllers
 {
@@ -17,6 +18,7 @@ namespace FeedbackBot.Controllers
 
         public GitHubClient client;
         public string kerberos;
+        public string _appName;
 
         public HomeController(IOptions<AppSettings> appSettings)
         {
@@ -37,15 +39,23 @@ namespace FeedbackBot.Controllers
             return client;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
+        {
+            ViewData["Message"] = "Welcome";
+            return View();
+        }
+
+        [HttpGet("/app/{appName}")]
+        public async Task<IActionResult> app(string appName)
         {
             // Filters: Created by User, Labels "feedback", and default set to only open feedback issues
-            var recently = new IssueRequest
+            var recently = new RepositoryIssueRequest
             {
                 Filter = IssueFilter.Created,
                 Labels = { "feedback" }
             };
-            var issues = await client.Issue.GetAllForCurrent(recently);
+            var issues = await client.Issue.GetAllForRepository("ucdavis", appName, recently);
+
             // List out all the current issues
             List<issuesContainer> issueContainerList = new List<issuesContainer>();
             foreach (Issue i in issues)
@@ -55,7 +65,8 @@ namespace FeedbackBot.Controllers
                 newIssueContainer.deserialize(i);
                 issueContainerList.Add(newIssueContainer);
             }
-            ViewData["Message"] = "Hi, submit a new feedback";
+            ViewData["AppName"] = appName;
+            ViewData["Message"] = "Current Feedback for " + appName;
             return View(issueContainerList);
         }
 
@@ -65,26 +76,26 @@ namespace FeedbackBot.Controllers
          * @param string descrption - The description of the feedback
          */
         [HttpPost("createIssue")]
-        public async Task<ActionResult> CreateIssue(string title, string description)
+        public async Task<ActionResult> CreateIssue(string title, string description, string appName)
         {
             // Initialize new issue
             var createIssue = new NewIssue(title)
             {
-                Body = string.Format("{0}\r\n--------------------\r\nVotes: 1\r\nVoters: {1}", description, getKerberos()),
+                Body = string.Format("{0}\r\n--------------------\r\nVotes: 1\r\nAuthor: {1}\r\nVoters: {2}", description, getKerberos(), getKerberos()),
                 Labels = { "feedback" }
             };
-            var issue = await client.Issue.Create("ucdavis", "FeedbackBot", createIssue);
-            return RedirectToAction("index");
+            var issue = await client.Issue.Create("ucdavis", appName, createIssue);
+            return RedirectToAction("details", "home", new { app = appName });
         }
 
         [HttpPost("addComment")]
-        public async Task<ActionResult> AddComment(string comment, string voteID)
+        public async Task<ActionResult> AddComment(string comment, string voteID, string appName)
         {
             int issueIDInt = Int32.Parse(voteID);
             comment = string.Format("{0} \r\n--------------------\r\nAuthor: {1}", comment, getKerberos());
-            var issue = await client.Issue.Get("ucdavis", "FeedbackBot", issueIDInt);
-            var addComment = await client.Issue.Comment.Create("ucdavis", "FeedbackBot", issueIDInt, comment);
-            return Redirect("/issues/" + voteID);
+            var issue = await client.Issue.Get("ucdavis", appName, issueIDInt);
+            var addComment = await client.Issue.Comment.Create("ucdavis", appName, issueIDInt, comment);
+            return RedirectToAction("details", "home", new { appName = appName, id = voteID });
         }
 
         /*
@@ -92,11 +103,11 @@ namespace FeedbackBot.Controllers
          * @param string voteID - The number of the issue we are upvoting
          */
         [HttpPost("vote")]
-        public async Task<ActionResult> Vote(string voteID)
+        public async Task<ActionResult> Vote(string voteID, string appName)
         {
             int issueIDInt = Int32.Parse(voteID);
 
-            var issue = await client.Issue.Get("ucdavis", "FeedbackBot", issueIDInt);
+            var issue = await client.Issue.Get("ucdavis", appName, issueIDInt);
             var newIssueContainer = new issuesContainer();
             newIssueContainer.kerberos = getKerberos();
             newIssueContainer.deserialize(issue);
@@ -121,29 +132,29 @@ namespace FeedbackBot.Controllers
             // Update issue on GitHub
             var update = issue.ToUpdate();
             update.Body = newIssueContainer.serialize();
-            await client.Issue.Update("ucdavis", "FeedbackBot", issueIDInt, update);
+            await client.Issue.Update("ucdavis", appName, issueIDInt, update);
 
             //Update voters
-            return RedirectToAction("index");
+            return RedirectToAction("details", "home", new { appName = appName, id = voteID });
         }
 
         /*
          * Displays the details of an issue along with all its comments
          * @param string voteID - The number of the issue we are upvoting
          */
-        [HttpGet("/issues/{id}")]
-        public async Task<IActionResult> Details(string id)
+        [HttpGet("/issues/{appName}/{id}")]
+        public async Task<IActionResult> Details(string appName, string id)
         {
             int issueIDInt = Int32.Parse(id);
 
             // Getting issue
-            var issue = await client.Issue.Get("ucdavis", "FeedbackBot", issueIDInt);
+            var issue = await client.Issue.Get("ucdavis", appName, issueIDInt);
             var newIssueContainer = new issuesContainer();
             newIssueContainer.kerberos = getKerberos();
             newIssueContainer.deserialize(issue);
 
             // Getting all comments in the issue
-            var issueComments = await client.Issue.Comment.GetAllForIssue("ucdavis", "FeedbackBot", issueIDInt);
+            var issueComments = await client.Issue.Comment.GetAllForIssue("ucdavis", appName, issueIDInt);
             var listOfComments = new List<commentContainer>();
             foreach (IssueComment i in issueComments)
             {
@@ -157,6 +168,7 @@ namespace FeedbackBot.Controllers
             issuesView.comments = listOfComments;
             issuesView.issue = newIssueContainer;
 
+            ViewData["AppName"] = appName;
             return View(issuesView);
         }
 
@@ -192,11 +204,12 @@ namespace FeedbackBot.Controllers
             public int number { get; set; }
             public string voteState { get; set; }
             public string kerberos { get; set; }
+            public string author { get; set;  }
 
             // Returns string of description for GitHub issue body
             public string serialize()
             {
-                var returnBody = string.Format("{0}\r\n--------------------\r\nVotes: {1}\r\nVoters: {2}", this.body, numOfVotes, stringOfVoters);
+                var returnBody = string.Format("{0}\r\n--------------------\r\nVotes: {1}\r\nAuthor: {2}\r\nVoters: {3}", body, numOfVotes, author, stringOfVoters);
                 return returnBody;
             }
 
@@ -208,10 +221,15 @@ namespace FeedbackBot.Controllers
                 this.number = issue.Number;
 
                 // Votes
-                var stringPattern = "(?<=Votes: )[0-9]+";
-                Match m = Regex.Match(issueBody, stringPattern);
-                this.numOfVotes = m.Value;
+                var votesStringPattern = "(?<=Votes: )[0-9]+";
+                Match votesText = Regex.Match(issueBody, votesStringPattern);
+                this.numOfVotes = votesText.Value;
                 this.numOfVotesInt = int.Parse(numOfVotes);
+
+                //Author
+                var authorStringPattern = "(?<=Author: )[a-zA-Z]+";
+                Match authorText = Regex.Match(issueBody, authorStringPattern);
+                this.author = authorText.Value;
 
                 // Feedback
                 var indexOfLine = issueBody.IndexOf("--------------------");
