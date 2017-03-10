@@ -4,18 +4,18 @@
         ViewData["Title"] = "Home Page";
         <h3 class="pageTitle">@ViewData["Message"]</h3>
     }
+
     <div id="newIssueBox" >
         @using (Html.BeginForm("createIssue", "Home",
                         new { appName = @ViewData["AppName"] }))
         {
             <div class="user">
-              <img class = "user_photo" src="~/media/empty_user.png">
               <p class = "user_name"></p>
             </div>
             <input type="text" id="title-input" placeholder="Title" name="title" />
-            <textarea placeholder="Type your feedback here" id="descriptionTextBox" type="text" name="description"></textarea>
+            <textarea placeholder="Type a new feedback" id="descriptionTextBox" type="text" name="description"></textarea>
             <input type="hidden" name="appName" value="@ViewData["AppName"]" style="display:none;" /><br />
- <br>
+            <br>
             <button type="submit">Submit</button>
         }
     </div>
@@ -28,15 +28,14 @@
                 </div>
                 <div class="rightCard">
                     <h3 class="title">@issue.title</h3>
+                    <div class="user">
+                      <div class="userWritten">
+                        <p class = "user_name">by @issue.author</p>
+                        <!-- should also include date/time stamp -->
+                      </div>
+                    </div>
                     <div class="border-wrap">
                       <div class="  description">
-                      <div class="user">
-                        <img class = "user_photo" src="~/media/empty_user.png">
-                        <div class="userWritten">
-                          <p class = "user_name">@issue.author</p>
-                          <p>Written 10 hours ago </p>
-                        </div>
-                      </div>
                       </div>
                         <span>@issue.body</span><br />
                       </div>
