@@ -135,6 +135,7 @@ namespace FeedbackBot.Controllers
             update.Body = newIssueContainer.serialize();
             await client.Issue.Update("ucdavis", appName, issueIDInt, update);
 
+            TempData["voteValidationMessage"] = "Thank you for voting on this issue!";  
             //Update voters
             return RedirectToAction("details", "home", new { appName = appName, id = voteID });
         }
@@ -168,7 +169,10 @@ namespace FeedbackBot.Controllers
             var issuesView = new issueDetailsViewModel();
             issuesView.comments = listOfComments;
             issuesView.issue = newIssueContainer;
-
+            if (TempData["voteValidationMessage"] != null)
+            {
+                issuesView.voteMessage = TempData["voteValidationMessage"].ToString();
+            }
             ViewData["AppName"] = appName;
             return View(issuesView);
         }
@@ -177,6 +181,7 @@ namespace FeedbackBot.Controllers
         {
             public issuesContainer issue { get; set; }
             public List<commentContainer> comments { get; set; }
+            public string voteMessage { get; set; } 
         }
 
         public class commentContainer

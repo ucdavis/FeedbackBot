@@ -5,12 +5,17 @@
 }
 <h3>@ViewData["Message"]</h3>
 <br />
+
+@if(Model.voteMessage != null)
+{
+    <div>@Model.voteMessage</div>
+}
+
 <div id="newIssueBox">
     <div class="issueCard">
         <div class="leftCard">
             <div class="voteBox">
                 <p>@Model.issue.numOfVotes</p>
-
             </div>
             <div class="voteButton">
                 @using (Html.BeginForm("vote", "Home"))

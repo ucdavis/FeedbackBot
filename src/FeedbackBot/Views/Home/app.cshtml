@@ -3,7 +3,7 @@
 @model IReadOnlyList<FeedbackBot.Controllers.HomeController.issuesContainer>
 @{
     ViewData["Title"] = "Home Page";
-    <h3>@ViewData["Message"]</h3>
+    <h3>@ViewData["AppName"]</h3>
 }
 
 <div>
@@ -21,7 +21,6 @@
 
     @foreach (var issue in Model)
     {
-
         <div class="issueCard">
             <div class="leftCard">
                 <div class="voteBox">
