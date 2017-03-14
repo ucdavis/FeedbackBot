@@ -26,7 +26,9 @@
       "type": "platform"
     },
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.1.0",
-    "Octokit": "0.23.0"
+    "Octokit": "0.23.0",
+    "Microsoft.AspNetCore.Session": "1.1.1",
+    "Microsoft.Extensions.Caching.Memory": "1.1.0"
   },
 
   "tools": {

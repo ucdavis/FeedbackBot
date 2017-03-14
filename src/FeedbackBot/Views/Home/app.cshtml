@@ -6,7 +6,8 @@
           <h3 class="pageTitle">Submit a new feedback for @ViewData["AppName"]</h3>
       }
 <div class="newWrapper">
-    <div id="newIssueBox" >
+    <div id="newIssueBox">
+        <h4>Submit New Feedback</h4>
         @using (Html.BeginForm("createIssue", "Home",
                         new { appName = @ViewData["AppName"] }))
         {
@@ -67,4 +68,15 @@
                 </div>
             </div>
         }
+            <div class="rightCard">
+                <p class="title">@issue.title</p>
+                <div class="description">
+                    <span>@issue.body</span><br />
+                    <span><b>Author: </b>@issue.author</span><br />
+                    <span><b>Voters: </b>@issue.stringOfVoters</span>
+                </div>
+                <div><a href="/issues/@ViewData["AppName"]/@issue.number">View Comments (@issue.numOfComments)</a></div>
+            </div>
+        </div>
+    }
 </div>

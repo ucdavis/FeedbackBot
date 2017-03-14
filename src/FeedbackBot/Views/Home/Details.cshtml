@@ -19,6 +19,35 @@
       <div class="user">
         <div class="userWritten">
           <p class = "user_name">by @Model.issue.author</p>
+<br />
+
+@if(Model.voteMessage != null)
+{
+    <div>@Model.voteMessage</div>
+}
+
+<div id="newIssueBox">
+    <div class="issueCard">
+        <div class="leftCard">
+            <div class="voteBox">
+                <p>@Model.issue.numOfVotes</p>
+            </div>
+            <div class="voteButton">
+                @using (Html.BeginForm("vote", "Home"))
+                {
+                    <input type="text" class="voteID" name="voteID" value="@Model.issue.number" style="display:none;" />
+                    <input type="text" name="appName" value="@ViewData["AppName"]" style="display:none;" />
+                    <input type="submit" value="@Model.issue.voteState" id="@Model.issue.number" />
+                }
+            </div>
+        </div>
+        <div class="rightCard">
+            <p class="title">@Model.issue.title</p>
+            <div class="description">
+                <span>@Model.issue.body</span><br />
+                <span><b>Author: </b>@Model.issue.author</span><br />
+                <span><b>Voters: </b>@Model.issue.stringOfVoters</span>
+            </div>
         </div>
       </div>
       <div class="border-wrap">
