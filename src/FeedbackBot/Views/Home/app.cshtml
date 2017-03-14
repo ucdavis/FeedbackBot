@@ -44,6 +44,7 @@
                     <p><b>Upvoted by:</b>
                     @issue.stringOfVoters</p>
                     <br>
+                    <div class="voteSection">
                     <div class="voteButton">
                     @using (Html.BeginForm("vote", "Home"))
                     {
@@ -56,6 +57,8 @@
                     </div>
                     <a href="/issues/@ViewData["AppName"]/@issue.number"><button> comments </button></a>
                     </div>
+                  </div>
+
                 </div>
             </div>
         }

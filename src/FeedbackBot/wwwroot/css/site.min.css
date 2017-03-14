@@ -191,6 +191,11 @@ button {
     padding-right: 4px;
     align-items: center;
 }
+
+.vote button {
+  width: 100px;
+  height: 37px;
+}
 .issueCard {
     border-bottom: 1px solid rgb(218,218,218) ;
     display: flex; /* or inline-flex */
@@ -203,6 +208,22 @@ button {
     padding-top: 0px;
 }
 
+.commentIssue{
+      display: flex; /* or inline-flex */
+      flex-direction: row;
+      align-items: flex-start;
+      margin: 24px;
+      margin-top: 0px;
+      margin-bottom: 0px;
+      padding: 15px;
+      padding-top: 0px;
+}
+
+.voteSection {
+    display: flex;
+    width: 35%;
+    justify-content: space-between;
+}
 .commentCard {
     border-bottom: 1px solid rgb(218,218,218) ;
     display: flex; /* or inline-flex */
