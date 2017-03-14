@@ -190,14 +190,14 @@ button {
 }
 .voteButton{
     display: flex;
-    justify-content: space-between;
-    padding-right: 4px;
+    justify-content: space-around;
     align-items: center;
 }
 
 .vote button {
   width: 100px;
   height: 37px;
+  padding-bottom: 4px;
 }
 .issueCard {
     border-bottom: 1px solid rgb(218,218,218) ;
