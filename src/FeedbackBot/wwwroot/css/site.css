@@ -9,6 +9,12 @@
     width: 500px;
 }
 
+.logo {
+  margin-right: 16px;
+  margin-bottom: -10px;
+  max-width: 200px;
+}
+
 .voteButton {
     display: flex;
     flex-direction: row;

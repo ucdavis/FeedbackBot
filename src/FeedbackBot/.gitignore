@@ -1,0 +1,3 @@
+src/FeedbackBot/Controllers/HomeController.cs
+src/FeedbackBot/Views/Home/Details.cshtml
+src/FeedbackBot/Views/Home/Index.cshtml
