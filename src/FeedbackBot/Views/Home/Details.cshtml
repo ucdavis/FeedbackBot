@@ -14,23 +14,22 @@
 </div>
 <div class="rightCard">
     <h3 class="title">@Model.issue.title</h3>
-    <div class="border-wrap">
+
       <div class="description">
       <div class="user">
-        <img class = "user_photo" src="~/media/empty_user.png">
         <div class="userWritten">
-          <p class = "user_name">@Model.issue.author</p>
-          <p>Written 10 hours ago </p>
+          <p class = "user_name">by @Model.issue.author</p>
         </div>
       </div>
-      </div>
+      <div class="border-wrap">
         <span>@Model.issue.body</span><br />
+      </div>
       </div>
 
     <div class="vote">
     <p><b>Upvoted by:</b>
     @Model.issue.stringOfVoters</p>
-
+    <br>
     <div class="voteButton">
     @using (Html.BeginForm("vote", "Home"))
     {

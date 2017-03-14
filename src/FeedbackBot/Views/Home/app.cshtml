@@ -27,23 +27,23 @@
                   <!-- <img class= "leftCols"  src="~/media/lefthand.svg" alt=""> -->
                 </div>
                 <div class="rightCard">
-                    <h3 class="title">@issue.title</h3>
+                    <a href="/issues/@ViewData["AppName"]/@issue.number"><h3 class="title">@issue.title</h3></a>
                     <div class="user">
                       <div class="userWritten">
-                        <p class = "user_name">by @issue.author</p>
+                        <p class = "user_name"><b>by</b> @issue.author</p>
                         <!-- should also include date/time stamp -->
                       </div>
                     </div>
                     <div class="border-wrap">
                       <div class="  description">
-                      </div>
                         <span>@issue.body</span><br />
+                      </div>
                       </div>
 
                     <div class="vote">
                     <p><b>Upvoted by:</b>
                     @issue.stringOfVoters</p>
-
+                    <br>
                     <div class="voteButton">
                     @using (Html.BeginForm("vote", "Home"))
                     {
@@ -54,7 +54,7 @@
                     <p class="voteNum"> | </p>
                     <p class="voteNum">@issue.numOfVotes</p>
                     </div>
-                    <a href="/issues/@ViewData["AppName"]/@issue.number">comments</a>
+                    <a href="/issues/@ViewData["AppName"]/@issue.number"><button> comments </button></a>
                     </div>
                 </div>
             </div>

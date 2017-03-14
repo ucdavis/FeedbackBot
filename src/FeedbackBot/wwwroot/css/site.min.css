@@ -70,7 +70,7 @@ body{padding-top:50px;padding-bottom:20px}.body-content{padding-left:15px;paddin
 .user_name{
   width:200px;
   margin: 0;
-  color: rgb(22,87,161);
+  color: black;
 }
 .user{
   display: flex;
@@ -122,7 +122,7 @@ button {
     margin:0;
     padding:0;
     border-radius:2px;
-    font-size:1.125rem;
+    font-size:14px;
     text-transform:lowercase;
     outline:none;
     transition:transform .125s;
@@ -139,7 +139,7 @@ button {
   margin:0;
   padding:0;
   border-radius:2px;
-  font-size:16px;
+  font-size:14px;
   text-transform:lowercase;
   outline:none;
   transition:transform .125s;
@@ -278,7 +278,7 @@ button {
 
 
 .border-wrap {
-  border-left: 8px double #C99818;
+  border-left: 4px solid #C99818;
   padding-left: 16px;
 
 
@@ -385,6 +385,10 @@ body {
 .leftLanding .title {
   font-weight:bold;
   font-size: 24px;
+}
+
+.leftLanding button {
+  font-size: 1.125rem;
 }
 
 .flexContainer {
