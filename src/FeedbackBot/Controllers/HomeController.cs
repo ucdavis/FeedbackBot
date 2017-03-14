@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
+using System.Collections.ObjectModel;
 
 namespace FeedbackBot.Controllers
 {
@@ -85,7 +86,7 @@ namespace FeedbackBot.Controllers
                 Labels = { "feedback" }
             };
             var issue = await client.Issue.Create("ucdavis", appName, createIssue);
-            return RedirectToAction("details", "home", new { app = appName });
+            return RedirectToAction("app", "home", new { appName });
         }
 
         [HttpPost("addComment")]
@@ -205,6 +206,7 @@ namespace FeedbackBot.Controllers
             public string voteState { get; set; }
             public string kerberos { get; set; }
             public string author { get; set;  }
+            public int numOfComments { get; set; }
 
             // Returns string of description for GitHub issue body
             public string serialize()
@@ -219,6 +221,9 @@ namespace FeedbackBot.Controllers
                 var issueBody = issue.Body;
                 this.title = issue.Title;
                 this.number = issue.Number;
+
+                // Number of comments
+                this.numOfComments = issue.Comments;
 
                 // Votes
                 var votesStringPattern = "(?<=Votes: )[0-9]+";
