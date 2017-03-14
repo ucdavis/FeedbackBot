@@ -1,10 +1,11 @@
 <div class="bodyDiv">
-@model IReadOnlyList<FeedbackBot.Controllers.HomeController.issuesContainer>
-    @{
-        ViewData["Title"] = "Home Page";
-        <h3 class="pageTitle">@ViewData["Message"]</h3>
-    }
 
+  @model IReadOnlyList<FeedbackBot.Controllers.HomeController.issuesContainer>
+      @{
+          ViewData["Title"] = "Home Page";
+          <h3 class="pageTitle">Submit a new feedback for @ViewData["AppName"]</h3>
+      }
+<div class="newWrapper">
     <div id="newIssueBox" >
         @using (Html.BeginForm("createIssue", "Home",
                         new { appName = @ViewData["AppName"] }))
@@ -19,6 +20,10 @@
             <button type="submit">Submit</button>
         }
     </div>
+  </div>
+
+            <h3 class="pageTitle">@ViewData["Message"]</h3>
+
 
         @foreach (var issue in Model)
         {
