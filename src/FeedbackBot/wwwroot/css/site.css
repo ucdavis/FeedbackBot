@@ -3,7 +3,9 @@
 .logo {
   margin-right: 16px;
   max-width: 200px;
+
 }
+
 
 .navbar-fixed-top {
   padding-top: 8px;
@@ -146,7 +148,7 @@ button {
   text-transform:lowercase;
   outline:none;
   transition:transform .125s;
-  width: 100px;
+  min-width: 100px;
 }
 .buttonID {
   background: transparent;
@@ -404,6 +406,7 @@ body {
   padding: 16px;
   border-radius:4px;
   width: 48%;
+  min-width:300px;
 
 }
 

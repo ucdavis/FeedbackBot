@@ -50,7 +50,7 @@
           <div class="commentCard">
             @using (Html.BeginForm("addComment", "Home"))
             {
-              <textarea placeholder="Type your comment here" id="descriptionTextBoxComment" type="text" name="comment" value="@Model.issue.number"></textarea> <br>
+              <textarea placeholder="Type your comment here" id="descriptionTextBoxComment" type="text" name="comment" value="@Model.issue.number" class="commentBox"></textarea> <br>
               <button type="submit" id="@Model.issue.number">Submit</button>
               <input type="text" class="voteID" name="voteID" value="@Model.issue.number" style="display:none;" /><br />
               <input type="text" name="appName" value="@ViewData["AppName"]" style="display:none;" /><br />

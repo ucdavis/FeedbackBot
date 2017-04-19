@@ -146,7 +146,7 @@ button {
   text-transform:lowercase;
   outline:none;
   transition:transform .125s;
-  width: 100px;
+  min-width: 100px;
 }
 .buttonID {
   background: transparent;
@@ -404,6 +404,7 @@ body {
   padding: 16px;
   border-radius:4px;
   width: 48%;
+  min-width:300px;
 
 }
 
@@ -434,10 +435,44 @@ body {
 
 .leftLanding .description {
   width: 100%;
-  height: 30%;
 }
 
 .rightLanding {
   text-align: right;
   justify-content: center;
+}
+
+.webkit .navbar-header {
+  display: flex;
+}
+
+
+@media (max-width: 800px) {
+  .logo{
+    width: 40%;
+  }
+  .navbar-header {
+    text-align: center;
+  }
+  .webkit .navbar-header {
+    justify-content: center;
+  }
+
+  .rightCard{
+    width: 100%;
+  }
+  .description{
+    width: 100%;
+  }
+
+  .commentCard{
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  #descriptionTextBoxComment {
+    max-width: 300px;
+    width: 100%;
+  }
 }
