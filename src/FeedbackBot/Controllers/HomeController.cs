@@ -89,6 +89,17 @@ namespace FeedbackBot.Controllers
             return RedirectToAction("app", "home", new { appName });
         }
 
+        [HttpPost("search")]
+        public async Task<ActionResult> Search(string searchInput, string appName)
+        {
+            var request = new SearchIssuesRequest();
+            request.Repos.Add("ucdavis", appName);
+            request.Mentions = searchInput;
+            request.State = ItemState.Open;
+            var repos = await client.Search.SearchIssues(request);
+            return View();
+        }
+
         [HttpPost("addComment")]
         public async Task<ActionResult> AddComment(string comment, string voteID, string appName)
         {
@@ -136,7 +147,7 @@ namespace FeedbackBot.Controllers
             await client.Issue.Update("ucdavis", appName, issueIDInt, update);
 
             TempData["voteValidationMessage"] = "Thank you for voting on this issue!";  
-            //Update voters
+            // Update voters
             return RedirectToAction("details", "home", new { appName = appName, id = voteID });
         }
 
