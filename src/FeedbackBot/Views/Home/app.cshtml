@@ -11,8 +11,7 @@
                         new { appName = @ViewData["AppName"] }))
             {
                 <input type="text" id="searchInput" placeholder="Search issues..." name="searchInput" />
-                <input type="hidden" name="appName" value="@ViewData["AppName"]" style="display:none;" /><br />
-                <br>
+                <input type="hidden" name="appName" value="@ViewData["AppName"]" style="display:none;" />
                 <button type="submit">Submit</button>
             }
         </div>

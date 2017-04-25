@@ -3,38 +3,21 @@
     @model IReadOnlyList<FeedbackBot.Controllers.HomeController.issuesContainer>
     @{
         ViewData["Title"] = "Home Page";
-        <h3 class="pageTitle">Submit a new feedback for @ViewData["AppName"]</h3>
     }
+    <a href="/app/@ViewData["AppName"]" style="float:left;">Back</a>
+
+    <h3 class="pageTitle">Search Results For @ViewData["SearchTerm"] in <a href="/app/@ViewData["AppName"]">@ViewData["AppName"]</a></h3>
     <div class="newWrapper">
         <div id="newIssueBox">
             @using (Html.BeginForm("search", "Home",
                         new { appName = @ViewData["AppName"] }))
             {
                 <input type="text" id="searchInput" placeholder="Search issues..." name="searchInput" />
-                <input type="hidden" name="appName" value="@ViewData["AppName"]" style="display:none;" /><br />
-                <br>
+                <input type="hidden" name="appName" value="@ViewData["AppName"]" style="display:none;" />
                 <button type="submit">Submit</button>
             }
         </div>
     </div>
-    <div class="newWrapper">
-        <div id="newIssueBox">
-            @using (Html.BeginForm("createIssue", "Home",
-                        new { appName = @ViewData["AppName"] }))
-            {
-                <div class="user">
-                    <p class="user_name"></p>
-                </div>
-                <input type="text" id="title-input" placeholder="Title" name="title" />
-                <textarea placeholder="Type a new feedback" id="descriptionTextBox" type="text" name="description"></textarea>
-                <input type="hidden" name="appName" value="@ViewData["AppName"]" style="display:none;" /><br />
-                <br>
-                <button type="submit">Submit</button>
-            }
-        </div>
-    </div>
-
-    <h3 class="pageTitle">@ViewData["AppName"]</h3>
 
     @foreach (var issue in Model)
     {
