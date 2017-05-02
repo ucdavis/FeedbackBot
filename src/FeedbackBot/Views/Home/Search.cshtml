@@ -3,18 +3,13 @@
     @model IReadOnlyList<FeedbackBot.Controllers.HomeController.issuesContainer>
     @{
         ViewData["Title"] = "Home Page";
-        <h3 class="pageTitle">Submit a new feedback for @ViewData["AppName"]</h3>
     }
+    <a href="/app/@ViewData["AppName"]" style="float:left;">Back</a>
 
+    <h3 class="pageTitle">Search Results For @ViewData["SearchTerm"] in <a href="/app/@ViewData["AppName"]">@ViewData["AppName"]</a></h3>
     @{
         Html.RenderPartial("SearchBarPartial");
     }
-
-    @{
-        Html.RenderPartial("NewIssuePartial");
-    }
-
-    <h3 class="pageTitle">@ViewData["AppName"]</h3>
 
     @{
         Html.RenderPartial("DisplayIssuesPartial");

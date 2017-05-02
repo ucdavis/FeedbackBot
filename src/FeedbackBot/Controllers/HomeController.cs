@@ -89,6 +89,32 @@ namespace FeedbackBot.Controllers
             return RedirectToAction("app", "home", new { appName });
         }
 
+        [HttpPost("search")]
+        public async Task<ActionResult> Search(string searchInput, string appName)
+        {
+            if (searchInput == null)
+            {
+                return RedirectToAction("app", "home", new { appName });
+            }
+            var request = new SearchIssuesRequest(searchInput);
+            request.Repos.Add("ucdavis", appName);
+            request.Labels = new List<string>() { "feedback" }; ;
+            request.State = ItemState.Open;
+            var repos = await client.Search.SearchIssues(request);
+            List<issuesContainer> issueContainerList = new List<issuesContainer>();
+            foreach (Issue i in repos.Items)
+            {
+                var newIssueContainer = new issuesContainer();
+                newIssueContainer.kerberos = getKerberos();
+                newIssueContainer.deserialize(i);
+                issueContainerList.Add(newIssueContainer);
+            }
+            ViewData["AppName"] = appName;
+            ViewData["SearchTerm"] = searchInput;
+            ViewData["Message"] = "Search Results For  " + searchInput + " In " + appName;
+            return View(issueContainerList);
+        }
+
         [HttpPost("addComment")]
         public async Task<ActionResult> AddComment(string comment, string voteID, string appName)
         {
@@ -136,7 +162,7 @@ namespace FeedbackBot.Controllers
             await client.Issue.Update("ucdavis", appName, issueIDInt, update);
 
             TempData["voteValidationMessage"] = "Thank you for voting on this issue!";  
-            //Update voters
+            // Update voters
             return RedirectToAction("details", "home", new { appName = appName, id = voteID });
         }
 
