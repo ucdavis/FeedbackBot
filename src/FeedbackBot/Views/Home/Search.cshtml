@@ -7,60 +7,11 @@
     <a href="/app/@ViewData["AppName"]" style="float:left;">Back</a>
 
     <h3 class="pageTitle">Search Results For @ViewData["SearchTerm"] in <a href="/app/@ViewData["AppName"]">@ViewData["AppName"]</a></h3>
-    <div class="newWrapper">
-        <div id="newIssueBox">
-            @using (Html.BeginForm("search", "Home",
-                        new { appName = @ViewData["AppName"] }))
-            {
-                <input type="text" id="searchInput" placeholder="Search issues..." name="searchInput" />
-                <input type="hidden" name="appName" value="@ViewData["AppName"]" style="display:none;" />
-                <button type="submit">Submit</button>
-            }
-        </div>
-    </div>
+    @{
+        Html.RenderPartial("SearchBarPartial");
+    }
 
-    @foreach (var issue in Model)
-    {
-        <div class="issueCard">
-            <div class="leftCard">
-                <!-- <img class= "leftCols"  src="~/media/lefthand.svg" alt=""> -->
-            </div>
-            <div class="rightCard">
-                <a href="/issues/@ViewData["AppName"]/@issue.number"><h3 class="title">@issue.title</h3></a>
-                <div class="user">
-                    <div class="userWritten">
-                        <p class="user_name"><b>by</b> @issue.author</p>
-                        <!-- should also include date/time stamp -->
-                    </div>
-                </div>
-                <div class="border-wrap">
-                    <div class=" description">
-                        <span>@issue.body</span><br />
-                    </div>
-                </div>
-
-                <div class="vote">
-                    <p>
-                        <b>Upvoted by:</b>
-                        @issue.stringOfVoters
-                    </p>
-                    <br>
-                    <div class="voteSection">
-                        <div class="voteButton">
-                            @using (Html.BeginForm("vote", "Home"))
-                            {
-                                <input class="voteID" name="voteID" value="@issue.number" type="hidden" />
-                                <input name="appName" value="@ViewData["AppName"]" type="hidden" />
-                                <input type="submit" class="buttonID" value="@issue.voteState" id="@issue.number" />
-                            }
-                            <p class="voteNum"> | </p>
-                            <p class="voteNum">@issue.numOfVotes</p>
-                        </div>
-                        <a href="/issues/@ViewData["AppName"]/@issue.number"><button> comments (@issue.numOfComments)</button></a>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+    @{
+        Html.RenderPartial("DisplayIssuesPartial");
     }
 </div>
