@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CasAuthenticationMiddleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,7 +25,7 @@ namespace FeedbackBot
             if (env.IsDevelopment())
             {
                 // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
-                builder.AddUserSecrets();
+                builder.AddUserSecrets<Startup>();
             }
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
@@ -37,9 +36,17 @@ namespace FeedbackBot
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDistributedMemoryCache();
-            services.AddSession(/* options go here */);
+            // global configuration
+            services.AddSingleton<IConfiguration>(_ => Configuration);
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+
+            // caching
+            services.AddDistributedMemoryCache();
+
+            // sessions
+            services.AddSession(/* options go here */);
+
+            // cookie authentication
             services.AddAuthentication(sharedOptions => sharedOptions.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme);
 
             // Add framework services.
@@ -52,7 +59,6 @@ namespace FeedbackBot
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            app.UseSession();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -63,6 +69,8 @@ namespace FeedbackBot
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            app.UseSession();
+
             app.UseStaticFiles();
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions
@@ -71,13 +79,13 @@ namespace FeedbackBot
                 AutomaticChallenge = true
             });
 
-
-            app.UseCasAuthentication(new CasAuthenticationOptions
+            app.UseCasAuthentication(new CasOptions
             {
-                AuthenticationScheme = "ucdcas",
-                AuthorizationEndpoint = "https://cas.ucdavis.edu/cas/",
-                CallbackPath = new PathString("/home/caslogin"),
-                DisplayName = "UCD CAS"
+                AuthenticationScheme = "UCDCAS",
+                AutomaticChallenge = true,
+                AutomaticAuthenticate = true,
+                CasServerUrlBase = "https://cas.ucdavis.edu/cas/",
+                CallbackPath = new PathString("/signin-cas")
             });
 
             app.UseMvc(routes =>
