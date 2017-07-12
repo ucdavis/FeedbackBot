@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using FeedbackBot.Controllers;
+using FeedbackBot.Services;
 
 namespace FeedbackBot
 {
@@ -39,6 +40,9 @@ namespace FeedbackBot
             // global configuration
             services.AddSingleton<IConfiguration>(_ => Configuration);
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+
+            // infrastructure
+            services.AddTransient<IGitHubService, GitHubService>();
 
             // caching
             services.AddDistributedMemoryCache();

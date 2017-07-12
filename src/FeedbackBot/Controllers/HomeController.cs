@@ -1,73 +1,47 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Octokit;
-using System.Text.RegularExpressions;
+using FeedbackBot.Models;
+using FeedbackBot.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Http;
-using System.Collections.ObjectModel;
+using Octokit;
 
 namespace FeedbackBot.Controllers
 {
-    [Authorize(ActiveAuthenticationSchemes = "ucdcas")]
+    [Authorize]
     public class HomeController : Controller
     {
-        private readonly AppSettings _appSettings;
+        private readonly IGitHubService _gitHubService;
 
-        public GitHubClient client;
-        public string kerberos;
-        public string _appName;
-
-        public HomeController(IOptions<AppSettings> appSettings)
+        public HomeController(IGitHubService gitHubService)
         {
-            _appSettings = appSettings.Value;
-            client = initialize();
-        }
-
-        public string getKerberos()
-        {
-            return User.Identity.Name;
-        }
-
-        public GitHubClient initialize()
-        {
-            var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            var basicAuth = new Credentials(_appSettings.GitHubUser, _appSettings.GitHubPassword);
-            client.Credentials = basicAuth;
-            return client;
+            _gitHubService = gitHubService;
         }
 
         public IActionResult Index()
         {
             ViewData["Message"] = "Welcome";
+
             return View();
         }
 
         [HttpGet("/app/{appName}")]
-        public async Task<IActionResult> app(string appName)
+        public async Task<IActionResult> App(string appName)
         {
-            // Filters: Created by User, Labels "feedback", and default set to only open feedback issues
-            var recently = new RepositoryIssueRequest
-            {
-                Filter = IssueFilter.Created,
-                Labels = { "feedback" }
-            };
-            var issues = await client.Issue.GetAllForRepository("ucdavis", appName, recently);
+            var issues = await _gitHubService.GetIssues(appName);
 
             // List out all the current issues
-            List<issuesContainer> issueContainerList = new List<issuesContainer>();
-            foreach (Issue i in issues)
+            var issueContainerList = new List<IssueContainer>();
+            foreach (var i in issues)
             {
-                var newIssueContainer = new issuesContainer();
-                newIssueContainer.kerberos = getKerberos();
-                newIssueContainer.deserialize(i);
+                var newIssueContainer = new IssueContainer { Kerberos = User.Identity.Name };
+                newIssueContainer.Deserialize(i);
                 issueContainerList.Add(newIssueContainer);
             }
             ViewData["AppName"] = appName;
             ViewData["Message"] = "Current Feedback for " + appName;
+
             return View(issueContainerList);
         }
 
@@ -82,11 +56,16 @@ namespace FeedbackBot.Controllers
             // Initialize new issue
             var createIssue = new NewIssue(title)
             {
-                Body = string.Format("{0}\r\n--------------------\r\nVotes: 1\r\nAuthor: {1}\r\nVoters: {2}", description, getKerberos(), getKerberos()),
+                Body =
+                    $"{description}\r\n" +
+                    "--------------------\r\n" +
+                    "Votes: 1\r\n" +
+                    $"Author: {User.Identity.Name}\r\n" +
+                    $"Voters: {User.Identity.Name}",
                 Labels = { "feedback" }
             };
-            var issue = await client.Issue.Create("ucdavis", appName, createIssue);
-            return RedirectToAction("app", "home", new { appName });
+            var issue = await _gitHubService.CreateIssue(appName, createIssue);
+            return RedirectToAction("App", "home", new { appName });
         }
 
         [HttpPost("search")]
@@ -94,34 +73,35 @@ namespace FeedbackBot.Controllers
         {
             if (searchInput == null)
             {
-                return RedirectToAction("app", "home", new { appName });
+                return RedirectToAction("App", "home", new { appName });
             }
-            var request = new SearchIssuesRequest(searchInput);
-            request.Repos.Add("ucdavis", appName);
-            request.Labels = new List<string>() { "feedback" }; ;
-            request.State = ItemState.Open;
-            var repos = await client.Search.SearchIssues(request);
-            List<issuesContainer> issueContainerList = new List<issuesContainer>();
-            foreach (Issue i in repos.Items)
+
+            var results = await _gitHubService.Search(appName, searchInput);
+
+            var issueContainerList = new List<IssueContainer>();
+            foreach (var i in results.Items)
             {
-                var newIssueContainer = new issuesContainer();
-                newIssueContainer.kerberos = getKerberos();
-                newIssueContainer.deserialize(i);
+                var newIssueContainer = new IssueContainer { Kerberos = User.Identity.Name };
+                newIssueContainer.Deserialize(i);
                 issueContainerList.Add(newIssueContainer);
             }
             ViewData["AppName"] = appName;
             ViewData["SearchTerm"] = searchInput;
             ViewData["Message"] = "Search Results For  " + searchInput + " In " + appName;
+
             return View(issueContainerList);
         }
 
         [HttpPost("addComment")]
         public async Task<ActionResult> AddComment(string comment, string voteID, string appName)
         {
-            int issueIDInt = Int32.Parse(voteID);
-            comment = string.Format("{0} \r\n--------------------\r\nAuthor: {1}", comment, getKerberos());
-            var issue = await client.Issue.Get("ucdavis", appName, issueIDInt);
-            var addComment = await client.Issue.Comment.Create("ucdavis", appName, issueIDInt, comment);
+            var id = int.Parse(voteID);
+            var body = $"{comment} \r\n" +
+                      "--------------------\r\n" +
+                      $"Author: {User.Identity.Name}";
+            var issue = await _gitHubService.GetIssue(appName, id);
+            var result = await _gitHubService.AddComment(appName, id, body);
+
             return RedirectToAction("details", "home", new { appName = appName, id = voteID });
         }
 
@@ -132,36 +112,37 @@ namespace FeedbackBot.Controllers
         [HttpPost("vote")]
         public async Task<ActionResult> Vote(string voteID, string appName)
         {
-            int issueIDInt = Int32.Parse(voteID);
+            var id = int.Parse(voteID);
 
-            var issue = await client.Issue.Get("ucdavis", appName, issueIDInt);
-            var newIssueContainer = new issuesContainer();
-            newIssueContainer.kerberos = getKerberos();
-            newIssueContainer.deserialize(issue);
+            var issue = await _gitHubService.GetIssue(appName, id);
+            var newIssueContainer = new IssueContainer { Kerberos = User.Identity.Name };
 
-            if (newIssueContainer.voteState == "unvote")
+            newIssueContainer.Deserialize(issue);
+
+            if (newIssueContainer.VoteState == "unvote")
             {
-                int newVoteCount = newIssueContainer.numOfVotesInt - 1;
-                newIssueContainer.numOfVotesInt = newVoteCount;
-                newIssueContainer.numOfVotes = newVoteCount.ToString();
-                newIssueContainer.listOfVoters.Remove(getKerberos());
+                var newVoteCount = newIssueContainer.NumOfVotesInt - 1;
+                newIssueContainer.NumOfVotesInt = newVoteCount;
+                newIssueContainer.NumOfVotes = newVoteCount.ToString();
+                newIssueContainer.ListOfVoters.Remove(User.Identity.Name);
             }
             else
             {
                 // Update vote count
-                int newVoteCount = newIssueContainer.numOfVotesInt + 1;
-                newIssueContainer.numOfVotesInt = newVoteCount;
-                newIssueContainer.numOfVotes = newVoteCount.ToString();
-                newIssueContainer.listOfVoters.Add(getKerberos());
+                var newVoteCount = newIssueContainer.NumOfVotesInt + 1;
+                newIssueContainer.NumOfVotesInt = newVoteCount;
+                newIssueContainer.NumOfVotes = newVoteCount.ToString();
+                newIssueContainer.ListOfVoters.Add(User.Identity.Name);
             }
-            newIssueContainer.stringOfVoters = string.Join(",", newIssueContainer.listOfVoters.ToArray()).Trim().TrimStart(',');
+            newIssueContainer.StringOfVoters = string.Join(",", newIssueContainer.ListOfVoters.ToArray()).Trim().TrimStart(',');
 
             // Update issue on GitHub
             var update = issue.ToUpdate();
-            update.Body = newIssueContainer.serialize();
-            await client.Issue.Update("ucdavis", appName, issueIDInt, update);
+            update.Body = newIssueContainer.Serialize();
+            await _gitHubService.UpdateIssue(appName, id, update);
 
             TempData["voteValidationMessage"] = "Thank you for voting on this issue!";  
+
             // Update voters
             return RedirectToAction("details", "home", new { appName = appName, id = voteID });
         }
@@ -171,41 +152,35 @@ namespace FeedbackBot.Controllers
          * @param string voteID - The number of the issue we are upvoting
          */
         [HttpGet("/issues/{appName}/{id}")]
-        public async Task<IActionResult> Details(string appName, string id)
+        public async Task<IActionResult> Details(string appName, int id)
         {
-            int issueIDInt = Int32.Parse(id);
-
             // Getting issue
-            var issue = await client.Issue.Get("ucdavis", appName, issueIDInt);
-            var newIssueContainer = new issuesContainer();
-            newIssueContainer.kerberos = getKerberos();
-            newIssueContainer.deserialize(issue);
+            var issue = await _gitHubService.GetIssue(appName, id);
+            var newIssueContainer = new IssueContainer { Kerberos = User.Identity.Name };
+            newIssueContainer.Deserialize(issue);
 
             // Getting all comments in the issue
-            var issueComments = await client.Issue.Comment.GetAllForIssue("ucdavis", appName, issueIDInt);
-            var listOfComments = new List<commentContainer>();
-            foreach (IssueComment i in issueComments)
+            var issueComments = await _gitHubService.GetComments(appName, id);
+            var listOfComments = new List<CommentContainer>();
+            foreach (var i in issueComments)
             {
-                var commentContainer = new commentContainer();
-                commentContainer.deserialize(i);
+                var commentContainer = new CommentContainer();
+                commentContainer.Deserialize(i);
                 listOfComments.Add(commentContainer);
             }
 
             // Update model view
-            var issuesView = new issueDetailsViewModel();
-            issuesView.comments = listOfComments;
-            issuesView.issue = newIssueContainer;
+            var issuesView = new IssueDetailsViewModel
+            {
+                Comments = listOfComments,
+                Issue = newIssueContainer
+            };
+
             if (TempData["voteValidationMessage"] != null)
             {
-                issuesView.voteMessage = TempData["voteValidationMessage"].ToString();
+                issuesView.VoteMessage = TempData["voteValidationMessage"].ToString();
             }
             ViewData["AppName"] = appName;
-            return View(issuesView);
-        }
-
-
-            {
-            }
 
 
 
