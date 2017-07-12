@@ -203,89 +203,10 @@ namespace FeedbackBot.Controllers
             return View(issuesView);
         }
 
-        public class issueDetailsViewModel
-        {
-            public issuesContainer issue { get; set; }
-            public List<commentContainer> comments { get; set; }
-            public string voteMessage { get; set; } 
-        }
 
-        public class commentContainer
-        {
-            public string body { get; set; }
-            public string author { get; set; }
-            public string createDate { get; set; }
-
-            public void deserialize(Octokit.IssueComment comment)
             {
-                var indexOfLine = comment.Body.IndexOf("--------------------");
-                this.body = comment.Body.Substring(0, indexOfLine);
-                var indexOfAuthor = comment.Body.IndexOf("Author:");
-                this.author = comment.Body.Substring(indexOfAuthor + 7);
-                this.createDate = comment.CreatedAt.ToString().Remove(9);
-            }
-        }
-
-        public class issuesContainer {
-            public string title { get; set; }
-            public string numOfVotes { get; set; }
-            public int numOfVotesInt { get; set; }
-            public string stringOfVoters { get; set; }
-            public List<string> listOfVoters { get; set; }
-            public string body { get; set; }
-            public int number { get; set; }
-            public string voteState { get; set; }
-            public string kerberos { get; set; }
-            public string author { get; set;  }
-            public int numOfComments { get; set; }
-
-            // Returns string of description for GitHub issue body
-            public string serialize()
-            {
-                var returnBody = string.Format("{0}\r\n--------------------\r\nVotes: {1}\r\nAuthor: {2}\r\nVoters: {3}", body, numOfVotes, author, stringOfVoters);
-                return returnBody;
             }
 
-            public void deserialize(Octokit.Issue issue)
-            {
-                // Issue body, title, and issue number
-                var issueBody = issue.Body;
-                this.title = issue.Title;
-                this.number = issue.Number;
-
-                // Number of comments
-                this.numOfComments = issue.Comments;
-
-                // Votes
-                var votesStringPattern = "(?<=Votes: )[0-9]+";
-                Match votesText = Regex.Match(issueBody, votesStringPattern);
-                this.numOfVotes = votesText.Value;
-                this.numOfVotesInt = int.Parse(numOfVotes);
-
-                //Author
-                var authorStringPattern = "(?<=Author: )[a-zA-Z]+";
-                Match authorText = Regex.Match(issueBody, authorStringPattern);
-                this.author = authorText.Value;
-
-                // Feedback
-                var indexOfLine = issueBody.IndexOf("--------------------");
-                this.body = issueBody.Substring(0, indexOfLine);
-
-                // Voters
-                var indexOfVoters = issueBody.IndexOf("Voters:");
-                this.stringOfVoters = issueBody.Substring(indexOfVoters + 7);
-                this.listOfVoters = this.stringOfVoters.Split(',').Select(d => d.Trim()).ToList();
-
-                if (this.stringOfVoters.IndexOf(this.kerberos) > 0)
-                {
-                    this.voteState = "unvote";
-                }
-                else
-                {
-                    this.voteState = "vote";
-                }
-            }
-        }
 
 
         public IActionResult About()
