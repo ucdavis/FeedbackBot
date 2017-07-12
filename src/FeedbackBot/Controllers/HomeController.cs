@@ -35,7 +35,7 @@ namespace FeedbackBot.Controllers
         public GitHubClient initialize()
         {
             var client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            var basicAuth = new Credentials("UCDFeedbackBot", _appSettings.GitHubPW);
+            var basicAuth = new Credentials(_appSettings.GitHubUser, _appSettings.GitHubPassword);
             client.Credentials = basicAuth;
             return client;
         }
