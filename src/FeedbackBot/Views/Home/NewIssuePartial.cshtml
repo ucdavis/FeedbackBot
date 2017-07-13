@@ -1,17 +1,18 @@
 
 <div class="newWrapper">
     <div id="newIssueBox">
-        @using (Html.BeginForm("createIssue", "Home",
-                                new { appName = @ViewData["AppName"] }))
+        @using (Html.BeginForm("createIssue", "Home", new { appName = ViewData["AppName"] }))
         {
+            <input type="hidden" name="appName" value="@ViewData["AppName"]" />
+
             <div class="user">
                 <p class="user_name"></p>
             </div>
             <input type="text" id="title-input" placeholder="Title" name="title" />
-                <textarea placeholder="Type a new feedback" id="descriptionTextBox" type="text" name="description"></textarea>
-                <input type="hidden" name="appName" value="@ViewData["AppName"]" style="display:none;" /><br />
-                <br>
-                <button type="submit">Submit</button>
+            <textarea placeholder="Type a new feedback" id="descriptionTextBox" type="text" name="description"></textarea>
+            <br />
+            <br />
+            <button type="submit">Submit</button>
         }
     </div>
 </div>

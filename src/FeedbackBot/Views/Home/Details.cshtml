@@ -12,7 +12,11 @@
     <div class="alert alert-info" role="alert">@Model.VoteMessage</div>
 }
 <br />
-<center><a href="/app/@ViewData["AppName"]">Back</a></center>
+
+<center>
+    <a href="@Url.Action("App", new {appName = ViewData["AppName"]})">Back</a>
+</center>
+
 <div class="commentWrapper">
     <div id="newIssueBox">
         <div class="commentIssue">

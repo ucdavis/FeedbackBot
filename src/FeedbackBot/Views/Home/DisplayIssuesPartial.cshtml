@@ -7,7 +7,7 @@
             <!-- <img class= "leftCols"  src="~/media/lefthand.svg" alt=""> -->
         </div>
         <div class="rightCard">
-            <a href="/issues/@ViewData["AppName"]/@issue.Number"><h3 class="title">@issue.Title</h3></a>
+            <a href="@Url.Action("Details", new { appName = ViewData["AppName"], id = issue.Number })"><h3 class="title">@issue.Title</h3></a>
             <div class="user">
                 <div class="userWritten">
                     <p class="user_name"><b>by</b> @issue.Author</p>
@@ -31,13 +31,15 @@
                         @using (Html.BeginForm("vote", "Home"))
                         {
                             <input class="voteID" name="voteID" value="@issue.Number" type="hidden" />
-                                <input name="appName" value="@ViewData["AppName"]" type="hidden" />
-                                <input type="submit" class="buttonID" value="@issue.VoteState" id="@issue.Number" />
+                            <input name="appName" value="@ViewData["AppName"]" type="hidden" />
+                            <input type="submit" class="buttonID" value="@issue.VoteState" id="@issue.Number" />
                         }
                         <p class="voteNum"> | </p>
                         <p class="voteNum">@issue.NumOfVotes</p>
                     </div>
-                    <a href="/issues/@ViewData["AppName"]/@issue.Number"><button> comments (@issue.NumOfComments)</button></a>
+                    <a href="@Url.Action("Details", new {appName = ViewData["AppName"], id = issue.Number})">
+                        <button> comments (@issue.NumOfComments)</button>
+                    </a>
                 </div>
             </div>
 
