@@ -2,6 +2,7 @@ namespace FeedbackBot
 {
     public class AppSettings
     {
-        public string GitHubPW { get; set; }
+        public string GitHubUser { get; set; }
+        public string GitHubPassword { get; set; }
     }
 }

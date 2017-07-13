@@ -1,13 +1,16 @@
-<div class="bodyDiv">
+@model IReadOnlyList<FeedbackBot.Models.IssueContainer>
 
-    @model IReadOnlyList<FeedbackBot.Controllers.HomeController.issuesContainer>
+<div class="bodyDiv">
     @{
         ViewData["Title"] = "Home Page";
     }
-    <br />
-    <a href="/app/@ViewData["AppName"]">Back</a>
 
-    <h3 class="pageTitle">Search Results For @ViewData["SearchTerm"] in <a href="/app/@ViewData["AppName"]">@ViewData["AppName"]</a></h3>
+    <br />
+
+    <a href="@Url.Action("App", new { appName = ViewData["AppName"] })">Back</a>
+
+    <h3 class="pageTitle">Search Results For @ViewData["SearchTerm"] in <a href="@Url.Action("App", new { appName = ViewData["AppName"] })">@ViewData["AppName"]</a></h3>
+
     @{
         Html.RenderPartial("SearchBarPartial");
     }
