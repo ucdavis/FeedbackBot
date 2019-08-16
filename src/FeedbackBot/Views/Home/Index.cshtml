@@ -1,4 +1,4 @@
-@{
+    @{
     ViewData["Title"] = "Welcome";
 }
 <div class="welcome">
@@ -48,6 +48,15 @@
             <p class="title">Online Registration</p>
             <p class="description">Online Registration allows departments to manage and collect fees for events.</p>
             <a href="@Url.Action("App", new {appName = "Crp"})">
+                <button>view issues</button>
+            </a>
+        </div>
+    </div>
+    <div class="landingCard">
+        <div class="leftLanding">
+            <p class="title">PEAKS</p>
+            <p class="description">People, Equipment, Access, Keys and Space Tracking application</p>
+            <a href="@Url.Action("App", new {appName = "Peaks"})">
                 <button>view issues</button>
             </a>
         </div>
