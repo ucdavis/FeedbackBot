@@ -164,9 +164,12 @@ namespace FeedbackBot.Controllers
             var listOfComments = new List<CommentContainer>();
             foreach (var i in issueComments)
             {
-                var commentContainer = new CommentContainer();
-                commentContainer.Deserialize(i);
-                listOfComments.Add(commentContainer);
+                if (!string.IsNullOrWhiteSpace(i.Body)) {
+                    var commentContainer = new CommentContainer();
+                    commentContainer.Deserialize(i);
+                    listOfComments.Add(commentContainer);
+                }
+                
             }
 
             // Update model view
