@@ -1,3 +1,3 @@
 # FeedbackBot
 
-Feedback robot for github
+Friendly Feedback robot for github
