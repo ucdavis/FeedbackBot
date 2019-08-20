@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AspNetCore.Security.CAS;
+using FeedbackBot.Models;
 using FeedbackBot.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -30,6 +31,7 @@ namespace FeedbackBot
             // global configuration
             services.AddSingleton<IConfiguration>(_ => Configuration);
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+            services.Configure<AuthSettings>(Configuration.GetSection("Authentication"));
 
             // infrastructure
             services.AddTransient<IGitHubService, GitHubService>();
@@ -59,7 +61,7 @@ namespace FeedbackBot
             .AddCAS(options =>
             {
                 options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.CasServerUrlBase = "https://ssodev.ucdavis.edu/cas/";
+                options.CasServerUrlBase = Configuration["Authentication:CasBaseUrl"];
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
