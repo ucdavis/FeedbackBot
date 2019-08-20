@@ -86,7 +86,7 @@
 
 #title-input {
   width:100%;
-  height:50%;
+  height: auto;
   border: 0px;
   padding-left: 8px;
   margin-bottom: 16px;
@@ -276,7 +276,7 @@ button {
 
 .leftCard {
     display: block;
-    background-color: #C99818;
+    /*background-color: #C99818;*/
     height: 30%;
     margin-top: 100px;
     width: 4px;
