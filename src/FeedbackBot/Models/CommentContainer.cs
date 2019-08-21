@@ -11,20 +11,11 @@ namespace FeedbackBot.Models
 
         public string CreateDate { get; set; }
 
-        public void Deserialize(IssueComment comment)
+        public void Deserialize(IssueComment comment, string bodyComment)
         {
-            if (string.IsNullOrWhiteSpace(comment.Body))
-            {
-                return;
-            }
-
-            var indexOfLine = comment.Body.IndexOf("--------------------");
-
-            if (indexOfLine >= 0)
-            {
-                Body = comment.Body.Substring(0, indexOfLine);
-            }
-
+           
+            Body = bodyComment;
+        
             var indexOfAuthor = comment.Body.IndexOf("Author:");
 
             if (indexOfAuthor >= 0)
