@@ -1,0 +1,72 @@
+@if (@appIssues != null)
+{
+  int i = 0;
+  @foreach (var issue in @appIssues)
+  {
+    <div class="issueCard">
+      <div class="leftCard">
+        <!-- <img class= "leftCols" src="~/media/lefthand.svg" alt=""> -->
+  </div>
+      <div class="rightCard">
+        <a href="/issues/@appName/@issue.Number">
+          <h3 class="title">@issue.Title</h3>
+        </a>
+        <div class="user">
+          <div class="userWritten">
+            <p class="user_name"><b>by</b> @issue.Author</p>
+            <!-- should also include date/time stamp -->
+      </div>
+        </div>
+        <div class="border-wrap">
+          <div class=" description">
+            <span>@issue.Body</span><br />
+          </div>
+        </div>
+
+        <div class="vote">
+          <p>
+            <b>Upvoted by:</b>
+            @issue.StringOfVoters
+          </p>
+          <br>
+          <div class="voteSection">
+            <VoteButton issueDetails=@issue OnVoted="((newIssueDetails) => Voted(issue, newIssueDetails))" />
+            <a href="/issues/@appName/@issue.Number">
+              <button> comments (@issue.NumOfComments)</button>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    i++;
+  }
+}
+
+@code {
+  [Parameter]
+  public BulkObservableCollection<IssueContainer>? appIssues { get; set; }
+
+  [CascadingParameter(Name = "appName")]
+  public string appName { get; set; } = "";
+
+  override protected void OnInitialized()
+  {
+    if (appIssues != null)
+    {
+      appIssues.CollectionChanged += (sender, e) =>
+      {
+        StateHasChanged();
+      };
+    }
+  }
+
+  private void Voted(IssueContainer currentIssue, IssueContainer newIssue)
+  {
+    if (appIssues != null)
+    {
+      appIssues[appIssues.IndexOf(currentIssue)] = newIssue;
+      StateHasChanged();
+    }
+  }
+}

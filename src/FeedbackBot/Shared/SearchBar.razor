@@ -1,0 +1,48 @@
+@inject IGitHubService gitHubService
+@inject IUserService userService
+
+<div class="newWrapper">
+  <div id="newIssueBox">
+    <EditForm Model="@formModel" OnValidSubmit="@DoSearch">
+      <InputText id="searchInput" placeholder="Search issues..." @bind-Value="formModel.Search" />
+      <button type="submit">Search</button>
+      <DataAnnotationsValidator />
+      <ValidationSummary />
+    </EditForm>
+  </div>
+</div>
+
+@code {
+  [CascadingParameter(Name = "appName")]
+  public string appName { get; set; } = "";
+
+  [Parameter]
+  public BulkObservableCollection<IssueContainer>? appIssues { get; set; }
+
+  private FormModel formModel = new();
+
+  async Task DoSearch()
+  {
+    if (!await userService.IsAuthenticated() || string.IsNullOrEmpty(appName) || appIssues == null)
+    {
+      return;
+    }
+
+    var kerberos = await userService.GetKerberos();
+    var results = await gitHubService.Search(appName, formModel.Search);
+
+    appIssues.Clear();
+    appIssues.AddRange(results.Items.Select(i =>
+    {
+      var newIssueContainer = new IssueContainer { Kerberos = kerberos };
+      newIssueContainer.Deserialize(i);
+      return newIssueContainer;
+    }));
+  }
+
+  private class FormModel
+  {
+    [Required]
+    public string Search { get; set; } = "";
+  }
+}

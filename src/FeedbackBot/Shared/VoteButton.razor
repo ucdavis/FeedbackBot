@@ -1,0 +1,63 @@
+@inject IGitHubService gitHubService
+@inject IUserService userService
+
+<div class="voteButton">
+  <input type="submit" class="buttonID" value="@issueDetails?.VoteState" id="@issueDetails?.Number"
+         @onclick="(() => Vote(issueDetails?.Number))" />
+  <p class="voteNum"> | </p>
+  <p class="voteNum">@issueDetails?.NumOfVotes</p>
+</div>
+
+@code {
+  [CascadingParameter(Name = "appName")]
+  public string appName { get; set; } = "";
+
+  [Parameter]
+  public IssueContainer? issueDetails { get; set; }
+
+  [Parameter]
+  public Action<IssueContainer>? OnVoted { get; set; }
+
+  private async Task Vote(int? id)
+  {
+    if (!await userService.IsAuthenticated() || string.IsNullOrEmpty(appName) || id == null || issueDetails == null)
+    {
+      return;
+    }
+
+    var kerberos = await userService.GetKerberos() ?? "";
+
+    var issue = await gitHubService.GetIssue(appName, id.Value);
+    var newIssueContainer = new IssueContainer { Kerberos = kerberos };
+
+    newIssueContainer.Deserialize(issue);
+
+    if (newIssueContainer.VoteState == "unvote")
+    {
+      var newVoteCount = newIssueContainer.NumOfVotesInt - 1;
+      newIssueContainer.NumOfVotesInt = newVoteCount;
+      newIssueContainer.NumOfVotes = newVoteCount.ToString();
+      newIssueContainer.ListOfVoters.Remove(kerberos);
+    }
+    else
+    {
+      // Update vote count
+      var newVoteCount = newIssueContainer.NumOfVotesInt + 1;
+      newIssueContainer.NumOfVotesInt = newVoteCount;
+      newIssueContainer.NumOfVotes = newVoteCount.ToString();
+      newIssueContainer.ListOfVoters.Add(kerberos);
+    }
+    newIssueContainer.StringOfVoters = string.Join(",", newIssueContainer.ListOfVoters.ToArray()).Trim().TrimStart(',');
+
+    // Update issue on gitHubService
+    var update = issue.ToUpdate();
+    update.Body = newIssueContainer.Serialize();
+    await gitHubService.UpdateIssue(appName, id.Value, update);
+
+    issueDetails = newIssueContainer;
+
+    StateHasChanged();
+    OnVoted?.Invoke(newIssueContainer);
+  }
+
+}

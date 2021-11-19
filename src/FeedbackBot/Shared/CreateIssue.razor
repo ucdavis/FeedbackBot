@@ -1,0 +1,60 @@
+@inject IGitHubService gitHubService
+@inject IUserService userService
+@inject NavigationManager navigationManager
+
+<div class="newWrapper">
+  @* <h3 class="pageTitle">Submit a new feedback for @appName</h3> *@
+  <div id="newIssueBox">
+    <EditForm Model="@formModel" OnValidSubmit="@CreateNewIssue">
+      @* <div class="user">
+        <p class="user_name">AUserName</p>
+        </div> *@
+      <InputText id="title-input" placeholder="Title" @bind-Value="formModel.Title" />
+      <InputTextArea placeholder="Type a new feedback" id="descriptionTextBox" @bind-Value="formModel.Description" />
+      <br />
+      <br />
+      <button type="submit">Submit</button>
+      <DataAnnotationsValidator />
+      <ValidationSummary />
+    </EditForm>
+  </div>
+</div>
+
+@code {
+  [CascadingParameter(Name = "appName")]
+  public string appName { get; set; } = "";
+
+  private FormModel formModel = new();
+
+  async Task CreateNewIssue()
+  {
+    if (!await userService.IsAuthenticated())
+    {
+      return;
+    }
+
+    var kerberos = await userService.GetKerberos();
+
+    // Initialize new issue
+    var newIssue = new NewIssue(formModel.Title)
+      {
+        Body = $"{formModel.Description}\r\n" +
+              "--------------------\r\n" +
+              "Votes: 1\r\n" +
+              $"Author: {kerberos}\r\n" +
+              $"Voters: {kerberos}",
+        Labels = { "feedback" }
+      };
+    var issue = await gitHubService.CreateIssue(appName, newIssue);
+    navigationManager.NavigateTo($"/app/{appName}");
+  }
+
+  private class FormModel
+  {
+    [Required]
+    public string Title { get; set; } = "";
+
+    [Required]
+    public string Description { get; set; } = "";
+  }
+}

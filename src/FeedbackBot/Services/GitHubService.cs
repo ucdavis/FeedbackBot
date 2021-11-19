@@ -1,85 +1,82 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Octokit;
 
-namespace FeedbackBot.Services
+namespace FeedbackBot.Services;
+
+public interface IGitHubService
 {
-    public interface IGitHubService
+    Task<IEnumerable<Issue>> GetIssues(string appName);
+
+    Task<Issue> CreateIssue(string appName, NewIssue issue);
+
+    Task<Issue> GetIssue(string appName, int id);
+
+    Task UpdateIssue(string appName, int id, IssueUpdate update);
+
+    Task<IEnumerable<IssueComment>> GetComments(string appName, int issueId);
+
+    Task<IssueComment> AddComment(string appName, int issueId, string comment);
+
+    Task<SearchIssuesResult> Search(string appName, string query);
+}
+
+public class GitHubService : IGitHubService
+{
+    public GitHubClient client;
+
+    public GitHubService(IOptions<AppSettings> appSettings)
     {
-        Task<IEnumerable<Issue>> GetIssues(string appName);
+        var settings = appSettings.Value;
 
-        Task<Issue> CreateIssue(string appName, NewIssue issue);
+        client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
 
-        Task<Issue> GetIssue(string appName, int id);
-
-        Task UpdateIssue(string appName, int id, IssueUpdate update);
-
-        Task<IEnumerable<IssueComment>> GetComments(string appName, int issueId);
-
-        Task<IssueComment> AddComment(string appName, int issueId, string comment);
-
-        Task<SearchIssuesResult> Search(string appName, string query);
+        client.Credentials = new Credentials(settings.GitHubToken);
     }
 
-    public class GitHubService : IGitHubService
+    public async Task<IEnumerable<Issue>> GetIssues(string appName)
     {
-        public GitHubClient client;
-
-        public GitHubService(IOptions<AppSettings> appSettings)
+        var settings = new RepositoryIssueRequest
         {
-            var settings = appSettings.Value;
+            Filter = IssueFilter.Created,
+            Labels = { "feedback" }
+        };
 
-            client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            
-            client.Credentials = new Credentials(settings.GitHubToken);
-        }
+        return await client.Issue.GetAllForRepository("ucdavis", appName, settings);
+    }
 
-        public async Task<IEnumerable<Issue>> GetIssues(string appName)
-        {
-            var settings = new RepositoryIssueRequest
-            {
-                Filter = IssueFilter.Created,
-                Labels = { "feedback" }
-            };
+    public async Task<Issue> CreateIssue(string appName, NewIssue issue)
+    {
+        return await client.Issue.Create("ucdavis", appName, issue);
+    }
 
-            return await client.Issue.GetAllForRepository("ucdavis", appName, settings);
-        }
+    public async Task<Issue> GetIssue(string appName, int id)
+    {
+        return await client.Issue.Get("ucdavis", appName, id);
+    }
 
-        public async Task<Issue> CreateIssue(string appName, NewIssue issue)
-        {
-            return await client.Issue.Create("ucdavis", appName, issue);
-        }
+    public Task UpdateIssue(string appName, int id, IssueUpdate update)
+    {
+        return client.Issue.Update("ucdavis", appName, id, update);
+    }
 
-        public async Task<Issue> GetIssue(string appName, int id)
-        {
-            return await client.Issue.Get("ucdavis", appName, id);
-        }
+    public async Task<IEnumerable<IssueComment>> GetComments(string appName, int issueId)
+    {
+        return await client.Issue.Comment.GetAllForIssue("ucdavis", appName, issueId);
+    }
 
-        public Task UpdateIssue(string appName, int id, IssueUpdate update)
-        {
-            return client.Issue.Update("ucdavis", appName, id, update);
-        }
+    public async Task<IssueComment> AddComment(string appName, int issueId, string comment)
+    {
+        return await client.Issue.Comment.Create("ucdavis", appName, issueId, comment);
+    }
 
-        public async Task<IEnumerable<IssueComment>> GetComments(string appName, int issueId)
-        {
-            return await client.Issue.Comment.GetAllForIssue("ucdavis", appName, issueId);
-        }
+    public async Task<SearchIssuesResult> Search(string appName, string query)
+    {
+        var request = new SearchIssuesRequest(query);
+        request.Repos.Add("ucdavis", appName);
+        request.Labels = new List<string>() { "feedback" }; ;
+        request.State = ItemState.Open;
 
-        public async Task<IssueComment> AddComment(string appName, int issueId, string comment)
-        {
-            return await client.Issue.Comment.Create("ucdavis", appName, issueId, comment);
-        }
-
-        public async Task<SearchIssuesResult> Search(string appName, string query)
-        {
-            var request = new SearchIssuesRequest(query);
-            request.Repos.Add("ucdavis", appName);
-            request.Labels = new List<string>() { "feedback" }; ;
-            request.State = ItemState.Open;
-
-            return await client.Search.SearchIssues(request);
-        }
+        return await client.Search.SearchIssues(request);
     }
 }
+

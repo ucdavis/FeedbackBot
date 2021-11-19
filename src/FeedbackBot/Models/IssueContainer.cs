@@ -8,25 +8,25 @@ namespace FeedbackBot.Models
 {
     public class IssueContainer
     {
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
-        public string NumOfVotes { get; set; }
+        public string? NumOfVotes { get; set; }
 
         public int NumOfVotesInt { get; set; }
 
-        public string StringOfVoters { get; set; }
+        public string? StringOfVoters { get; set; }
 
-        public List<string> ListOfVoters { get; set; }
+        public List<string> ListOfVoters { get; set; } = new ();
 
-        public string Body { get; set; }
+        public string? Body { get; set; }
 
         public int Number { get; set; }
 
-        public string VoteState { get; set; }
+        public string? VoteState { get; set; }
 
-        public string Kerberos { get; set; }
+        public string? Kerberos { get; set; }
 
-        public string Author { get; set; }
+        public string? Author { get; set; }
 
         public int NumOfComments { get; set; }
 
@@ -70,7 +70,7 @@ namespace FeedbackBot.Models
             StringOfVoters = issueBody.Substring(indexOfVoters + 7);
             ListOfVoters = StringOfVoters.Split(',').Select(d => d.Trim()).ToList();
 
-            VoteState = StringOfVoters.IndexOf(Kerberos, StringComparison.Ordinal) > 0 ? "unvote" : "vote";
+            VoteState = StringOfVoters.IndexOf(Kerberos ?? "", StringComparison.Ordinal) > 0 ? "unvote" : "vote";
         }
     }
 }

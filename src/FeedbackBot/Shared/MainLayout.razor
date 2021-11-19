@@ -1,0 +1,27 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>FeedbackBot</PageTitle>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="/">
+        <img class="logo" src="/media/caes_logo.svg" alt="FeedbackBot at UC Davis">
+        <img class="logo" src="/media/logo_feedbackbot.svg" alt="FeedbackBot at UC Davis">
+      </a>
+    </div>
+    <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+        <li><a asp-controller="Account" asp-action="Logout">Sign out</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="container body-content">
+  @Body
+  <hr />
+  <footer>
+    <p>&copy; 2016 - FeedbackBot</p>
+  </footer>
+</div>
