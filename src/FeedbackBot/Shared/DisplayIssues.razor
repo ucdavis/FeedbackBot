@@ -6,7 +6,7 @@
     <div class="issueCard">
       <div class="leftCard">
         <!-- <img class= "leftCols" src="~/media/lefthand.svg" alt=""> -->
-  </div>
+      </div>
       <div class="rightCard">
         <a href="/issues/@appName/@issue.Number">
           <h3 class="title">@issue.Title</h3>
@@ -15,7 +15,7 @@
           <div class="userWritten">
             <p class="user_name"><b>by</b> @issue.Author</p>
             <!-- should also include date/time stamp -->
-      </div>
+          </div>
         </div>
         <div class="border-wrap">
           <div class=" description">
@@ -30,7 +30,7 @@
           </p>
           <br>
           <div class="voteSection">
-            <VoteButton issueDetails=@issue OnVoted="((newIssueDetails) => Voted(issue, newIssueDetails))" />
+            <VoteButton issueDetails=@issue OnVoted="Voted" />
             <a href="/issues/@appName/@issue.Number">
               <button> comments (@issue.NumOfComments)</button>
             </a>
@@ -61,11 +61,17 @@
     }
   }
 
-  private void Voted(IssueContainer currentIssue, IssueContainer newIssue)
+  private void Voted(IssueContainer issue)
   {
-    if (appIssues != null)
+    if (issue != null && appIssues != null)
     {
-      appIssues[appIssues.IndexOf(currentIssue)] = newIssue;
+      // the +1 -1 thing is so that it returns -1 for missing instead of 0
+      var i = appIssues.Where(x => x.Number == issue.Number).Select((x, i) => i + 1).SingleOrDefault() - 1;
+      if (i == -1)
+      {
+        return;
+      }
+      appIssues[i] = issue;
       StateHasChanged();
     }
   }

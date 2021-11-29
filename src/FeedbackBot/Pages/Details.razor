@@ -128,6 +128,7 @@
         Comments = listOfComments,
         Issue = newIssueContainer
       };
+    StateHasChanged();
   }
 
   private void Voted(IssueContainer issue)
@@ -169,6 +170,7 @@
     }
 
     issueDetails.Comments.Insert(0, comment);
+    StateHasChanged();
   }
 
 
