@@ -10,10 +10,10 @@ namespace FeedbackBot.Models
             Comments = new List<CommentContainer>();
         }
 
-        public IssueContainer Issue { get; set; }
+        public IssueContainer? Issue { get; set; }
 
         public List<CommentContainer> Comments { get; set; }
 
-        public string VoteMessage { get; set; }
+        public string? VoteMessage { get; set; }
     }
 }

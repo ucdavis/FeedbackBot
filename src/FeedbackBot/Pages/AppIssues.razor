@@ -1,0 +1,46 @@
+@page "/app/{appName}"
+@inject IGitHubService gitHubService
+@inject IUserService userService
+
+<PageTitle>Home Page - FeedbackBot</PageTitle>
+<CascadingValue Value="@appName" Name="appName">
+  <div class="bodyDiv">
+
+    <h3 class="pageTitle">@appName</h3>
+
+    <CreateIssue />
+
+    <SearchBar appIssues=@appIssues />
+
+    <DisplayIssues appIssues=@appIssues />
+  </div>
+
+</CascadingValue>
+
+@code {
+  [Parameter]
+  public string? appName { get; set; }
+
+  private BulkObservableCollection<IssueContainer> appIssues { get; init; } = new();
+
+  protected override async Task OnInitializedAsync()
+  {
+    if (!await userService.IsAuthenticated() || string.IsNullOrEmpty(appName))
+    {
+      return;
+    }
+
+    var kerberos = await userService.GetKerberos();
+    var issues = await gitHubService.GetIssues(appName);
+
+    // List out all the current issues
+    appIssues.Clear();
+    appIssues.AddRange(issues.Select(i =>
+    {
+      var newIssueContainer = new IssueContainer { Kerberos = kerberos };
+      newIssueContainer.Deserialize(i);
+      return newIssueContainer;
+    }));
+
+  }
+}

@@ -1,0 +1,182 @@
+@page "/issues/{appName}/{id:int}"
+@inject IGitHubService gitHubService
+@inject IUserService userService
+
+<PageTitle>Issue - FeedbackBot</PageTitle>
+
+<h3>@message</h3>
+
+<CascadingValue Value="@appName" Name="appName">
+
+  @if (issueDetails != null)
+  {
+    @if (issueDetails.VoteMessage != null)
+    {
+      <div class="alert alert-info" role="alert">@issueDetails.VoteMessage</div>
+    }
+    <br />
+
+    <center>
+      <a href="/app/@appName">Back</a>
+    </center>
+
+    <div class="commentWrapper">
+      <div id="newIssueBox">
+        <div class="commentIssue">
+          <div class="rightCard">
+            <h3 class="title">@issueDetails.Issue?.Title</h3>
+
+            <div class="description">
+              <p class="user_name">by @issueDetails.Issue?.Author</p>
+              <br />
+
+            </div>
+            <div class="border-wrap">
+              <span>@issueDetails.Issue?.Body</span><br />
+            </div>
+
+            <div class="vote">
+              <p>
+                <b>Upvoted by:</b>
+                @issueDetails.Issue?.StringOfVoters
+              </p>
+              <br>
+              <VoteButton issueDetails=@issueDetails.Issue OnVoted="Voted" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="newCommentBox">
+      <h4>Submit New Comment</h4><br />
+      <div class="commentCard">
+        <EditForm Model="@formModel" OnValidSubmit="@SubmitComment">
+          <InputTextArea id="descriptionTextBoxComment" class="commentBox" placeholder="Type your comment here"
+                       @bind-Value="formModel.Comment" />
+          <br />
+          <button type="submit" id="@id">Submit</button>
+          <DataAnnotationsValidator />
+          <ValidationSummary />
+        </EditForm>
+      </div>
+    </div>
+
+    <div class="currentComment">
+      @foreach (var comment in issueDetails.Comments)
+      {
+        <div id="newIssueBox">
+          <div class="issueComment">
+            <div class="rightCard">
+              <div><b>Date Created: </b> @comment.CreateDate</div><br />
+              <div><b>Comment: </b>@comment.Body</div><br />
+              <div><b>Author: </b>@comment.Author</div><br /><br />
+            </div>
+          </div>
+        </div>
+      }
+      <br />
+    </div>
+  }
+</CascadingValue>
+
+@code {
+
+  [Parameter]
+  public string? appName { get; set; }
+
+  [Parameter]
+  public int id { get; set; }
+
+  private IssueDetailsViewModel? issueDetails { get; set; }
+
+  private string message { get; set; } = "";
+
+  private FormModel formModel = new();
+
+
+  protected override async Task OnInitializedAsync()
+  {
+    await FetchIssueDetails();
+  }
+
+  private async Task FetchIssueDetails()
+  {
+    if (!await userService.IsAuthenticated() || string.IsNullOrEmpty(appName))
+    {
+      return;
+    }
+
+    var kerberos = await userService.GetKerberos();
+
+    // Getting issue
+    var issue = await gitHubService.GetIssue(appName, id);
+    var newIssueContainer = new IssueContainer { Kerberos = kerberos };
+    newIssueContainer.Deserialize(issue);
+
+    // Getting all comments in the issue
+    var issueComments = await gitHubService.GetComments(appName, id);
+    if (issueComments == null)
+    {
+      return;
+    }
+
+    var listOfComments = issueComments.Select(c => c.ToIssueCommentContainer())
+    .Where(c => c != null).Cast<CommentContainer>().ToList();
+
+    issueDetails = new IssueDetailsViewModel
+      {
+        Comments = listOfComments,
+        Issue = newIssueContainer
+      };
+    StateHasChanged();
+  }
+
+  private void Voted(IssueContainer issue)
+  {
+    if (issueDetails != null)
+    {
+      issueDetails.Issue = issue;
+      issueDetails.VoteMessage = "Thank you for voting on this issue!";
+      StateHasChanged();
+    }
+  }
+
+  private async Task SubmitComment()
+  {
+    if (!await userService.IsAuthenticated() || string.IsNullOrEmpty(appName) || issueDetails == null)
+    {
+      return;
+    }
+
+    var kerberos = await userService.GetKerberos();
+
+    var body = $"{formModel.Comment} \r\n" +
+               "--------------------\r\n" +
+               $"Author: {kerberos}";
+
+    var issue = await gitHubService.GetIssue(appName, id);
+    var result = await gitHubService.AddComment(appName, id, body);
+
+    if (result == null)
+    {
+      return;
+    }
+
+    var comment = result.ToIssueCommentContainer();
+
+    if (comment == null)
+    {
+      return;
+    }
+
+    issueDetails.Comments.Insert(0, comment);
+    StateHasChanged();
+  }
+
+
+  private class FormModel
+  {
+    [Required]
+    public string Comment { get; set; } = "";
+  }
+}
