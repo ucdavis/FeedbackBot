@@ -29,7 +29,7 @@ namespace FeedbackBot.Controllers
         [HttpGet("/app/{appName}")]
         public async Task<IActionResult> App(string appName)
         {
-            var issues = await _gitHubService.GetIssues(appName);
+            var issues = await _gitHubService.GetIssues(appName); 
 
             // List out all the current issues
             var issueContainerList = new List<IssueContainer>();
