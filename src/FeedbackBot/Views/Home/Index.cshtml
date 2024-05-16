@@ -1,39 +1,30 @@
-    @{
+@{
     ViewData["Title"] = "Welcome";
 }
 <div class="welcome">
-<h3>@ViewData["Message"]</h3>
+    <h3>@ViewData["Message"]</h3>
 
-<p>Welcome to feedback! This is a website to keep track of user feedback of various applications of UC Davis.</p>
+    <p>Welcome to feedback! This is a website to keep track of user feedback of various applications of UC Davis.</p>
 </div>
 <div class="flexContainer">
-<div class="landingCard">
-  <div class="leftLanding">
-      <p class="title">PrePurchasing</p>
-      <p class="description">PrePurchasing allows users to submit any type of order request, including KFS, MyTravel, and other campus services.</p>
-      <a href="@Url.Action("App", new {appName = "Purchasing"})">
-          <button>view issues</button>
-      </a>
-  </div>
-</div>
-<div class="landingCard">
-  <div class="leftLanding">
-      <p class="title">ACE</p>
-      <p class="description">Academic Course Evaluation (ACE) makes course evaluations easier for students, faculty, and staff.</p>
-      <a href="@Url.Action("App", new {appName = "Ace"})">
-          <button>view issues</button>
-      </a>
-  </div>
-</div>
-<div class="landingCard">
-  <div class="leftLanding">
-      <p class="title">Commencement</p>
-      <p class="description">Commencement allows staff to manage student's requests pertaining to Commencement activities.</p>
-      <a href="@Url.Action("App", new {appName = "Commencement"})">
-          <button>view issues</button>
-      </a>
-  </div>
-</div>
+    <div class="landingCard">
+        <div class="leftLanding">
+            <p class="title">PrePurchasing</p>
+            <p class="description">PrePurchasing allows users to submit any type of order request, including KFS, MyTravel, and other campus services.</p>
+            <a href="@Url.Action("App", new {appName = "Purchasing"})">
+                <button>view issues</button>
+            </a>
+        </div>
+    </div>
+    <div class="landingCard">
+        <div class="leftLanding">
+            <p class="title">ACE</p>
+            <p class="description">Academic Course Evaluation (ACE) makes course evaluations easier for students, faculty, and staff.</p>
+            <a href="@Url.Action("App", new {appName = "Ace"})">
+                <button>view issues</button>
+            </a>
+        </div>
+    </div>
     <div class="landingCard">
         <div class="leftLanding">
             <p class="title">FeedbackBot</p>
@@ -57,6 +48,24 @@
             <p class="title">PEAKS</p>
             <p class="description">People, Equipment, Access, Keys and Space Tracking application</p>
             <a href="@Url.Action("App", new {appName = "Peaks"})">
+                <button>view issues</button>
+            </a>
+        </div>
+    </div>
+    <div class="landingCard">
+        <div class="leftLanding">
+            <p class="title">Finjector</p>
+            <p class="description">Finjector is a tool to help you build, share, and use the new Aggie Enterprise Chart strings.</p>
+            <a href="@Url.Action("App", new {appName = "finjector"})">
+                <button>view issues</button>
+            </a>
+        </div>
+    </div>
+    <div class="landingCard">
+        <div class="leftLanding">
+            <p class="title">Hippo</p>
+            <p class="description">High Performance Computing Personnel Onboarding.</p>
+            <a href="@Url.Action("App", new {appName = "hippo"})">
                 <button>view issues</button>
             </a>
         </div>
