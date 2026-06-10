@@ -1,0 +1,54 @@
+@import "tailwindcss";
+@plugin "daisyui";
+@import "@ucdavis/gunrock-tailwind/imports.css";
+
+@source "../Views/**/*.cshtml";
+@source "../wwwroot/js/**/*.js";
+
+@theme {
+  --color-light-bg-100: oklch(100% 0 0);
+  --color-light-bg-200: #f8f8f8;
+  --color-light-bg-300: #e9e9e9;
+  --color-main-border: #e9e3ee;
+
+  --font-proxima-bold: "proxima-nova-b", sans-serif;
+
+  --color-primary-color: var(--color-ucd-gunrock);
+  --color-secondary-color: var(--color-ucd-gold);
+  --color-accent-color: var(--color-ucd-poppy);
+  --color-error-color: var(--color-ucd-doubledecker);
+  --color-info-color: var(--color-ucd-putahcreek);
+  --color-success-color: var(--color-ucd-quad);
+  --color-warning-color: #cd9400;
+}
+
+@plugin "daisyui/theme" {
+  name: "feedbackbot";
+  default: true;
+
+  --color-base-100: var(--color-light-bg-100);
+  --color-base-200: var(--color-light-bg-200);
+  --color-base-300: var(--color-light-bg-300);
+  --color-base-content: var(--color-dark-font);
+
+  --color-primary: var(--color-primary-color);
+  --color-primary-content: var(--color-light-font);
+
+  --color-secondary: var(--color-secondary-color);
+  --color-secondary-content: var(--color-dark-font);
+
+  --color-accent: var(--color-accent-color);
+  --color-accent-content: var(--color-light-font);
+
+  --color-error: var(--color-error-color);
+  --color-error-content: var(--color-light-font);
+
+  --color-info: var(--color-info-color);
+  --color-info-content: var(--color-light-font);
+
+  --color-success: var(--color-success-color);
+  --color-success-content: var(--color-light-font);
+
+  --color-warning: var(--color-warning-color);
+  --color-warning-content: var(--color-light-font);
+}

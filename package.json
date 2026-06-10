@@ -1,0 +1,21 @@
+{
+  "name": "feedbackbot",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "npm run build:css && dotnet build",
+    "build:css": "tailwindcss -i ./src/FeedbackBot/Styles/app.css -o ./src/FeedbackBot/wwwroot/css/tailwind.css --minify",
+    "watch:css": "tailwindcss -i ./src/FeedbackBot/Styles/app.css -o ./src/FeedbackBot/wwwroot/css/tailwind.css --watch",
+    "dev": "dotnet run --project src/FeedbackBot/FeedbackBot.csproj"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.18",
+    "@ucdavis/gunrock-tailwind": "^2.5.1",
+    "daisyui": "^5.5.14",
+    "tailwindcss": "^4.1.18"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
