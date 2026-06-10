@@ -1,5 +1,9 @@
 @model IReadOnlyList<FeedbackBot.Models.IssueContainer>
 
+@{
+    var appInfo = AppCatalog.Get(ViewData["AppName"]?.ToString());
+}
+
 @if (Model.Count == 0)
 {
     <div class="rounded-md border border-dashed border-main-border bg-base-200 p-8 text-center">
@@ -14,13 +18,19 @@ else
         {
             <article class="rounded-md border border-main-border bg-base-200 p-5 transition hover:border-primary/30">
                 <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                    <div class="min-w-0 flex-1">
-                        <a class="group inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                           href="@Url.Action("Details", new { appName = ViewData["AppName"], id = issue.Number })">
-                            <h4 class="text-xl font-extrabold text-base-content group-hover:text-primary">@issue.Title</h4>
-                        </a>
-                        <p class="mt-1 text-sm text-base-content/60">by @issue.Author</p>
-                        <p class="mt-4 whitespace-pre-line text-sm leading-6 text-base-content/80">@issue.Body</p>
+                    <div class="flex min-w-0 flex-1 gap-4">
+                        <img class="mt-1 h-8 w-8 shrink-0 object-contain"
+                             src="@Url.Content(appInfo.IconPath)"
+                             alt=""
+                             aria-hidden="true" />
+                        <div class="min-w-0 flex-1">
+                            <a class="group inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                               href="@Url.Action("Details", new { appName = ViewData["AppName"], id = issue.Number })">
+                                <h4 class="text-xl font-extrabold text-base-content group-hover:text-primary">@issue.Title</h4>
+                            </a>
+                            <p class="mt-1 text-sm text-base-content/60">by @issue.Author</p>
+                            <p class="mt-4 whitespace-pre-line text-sm leading-6 text-base-content/80">@issue.Body</p>
+                        </div>
                     </div>
 
                     <div class="flex shrink-0 flex-col gap-3 xl:w-48">

@@ -1,17 +1,5 @@
 @{
     ViewData["Title"] = "Welcome";
-
-    var apps = new[]
-    {
-        new { Name = "PrePurchasing", AppName = "Purchasing", Description = "Submit order requests for KFS, MyTravel, and other campus services." },
-        new { Name = "ACE", AppName = "Ace", Description = "Academic Course Evaluation makes course evaluations easier for students, faculty, and staff." },
-        new { Name = "FeedbackBot", AppName = "feedbackBot", Description = "Collect and route user feedback directly into the GitHub issue workflow." },
-        new { Name = "Online Registration", AppName = "Crp", Description = "Manage event registration and collect fees for departments." },
-        new { Name = "PEAKS", AppName = "Peaks", Description = "Track people, equipment, access, keys, and space." },
-        new { Name = "Finjector", AppName = "finjector", Description = "Build, share, and use Aggie Enterprise chart strings." },
-        new { Name = "Hippo", AppName = "hippo", Description = "High Performance Computing Personnel Onboarding." },
-        new { Name = "Walter", AppName = "walter", Description = "Warehouse Analytics and Ledger Tools for Enterprise Reporting." }
-    };
 }
 
 <div class="container">
@@ -19,16 +7,20 @@
         <h2 class="mt-2 text-2xl font-extrabold leading-tight">
             Track feedback where the work happens.
         </h2>
-        <p class="mt-4 text-lg text-base-content/70">Collect user feedback for UC Davis applications, review active
-            issues, and help teams prioritize what needs attention next.</p>
+        <p class="mt-1 text-lg text-base-content/70">Collect user feedback for UC Davis applications, review active
+            issues,<br> and help teams prioritize what needs attention next.</p>
 
-            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                @foreach (var app in apps)
+            <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                @foreach (var app in AppCatalog.Apps)
                 {
-                    <a class="group flex min-h-56 flex-col justify-between rounded-lg border border-main-border bg-base-100 p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                    <a class="group flex min-h-56 flex-col justify-between rounded-lg border border-main-border bg-base-100 p-5 shadow-sm transition hover:border-primary/30 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                        href="@Url.Action("App", new { appName = app.AppName })">
                         <div>
-                            <h3 class="text-xl font-extrabold">@app.Name</h3>
+                            <div class="flex justify-between gap-4">
+                                <h3 class="text-xl font-extrabold">@app.Name</h3>
+                                <img class="h-8 w-8 shrink-0 object-contain" src="@Url.Content(app.IconPath)" alt=""
+                                     aria-hidden="true" />
+                            </div>
                             <p class="mt-3 text-sm leading-6 text-base-content/70">@app.Description</p>
                         </div>
                         <span class="mt-6 inline-flex items-center text-sm font-bold uppercase text-primary">

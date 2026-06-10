@@ -1,34 +1,40 @@
 @model IReadOnlyList<FeedbackBot.Models.IssueContainer>
 
 @{
-    ViewData["Title"] = ViewData["AppName"];
+    var appInfo = AppCatalog.Get(ViewData["AppName"]?.ToString());
+    ViewData["Title"] = appInfo.Name;
 }
 
 <div class="container">
     <section>
         <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-                <p class="text-sm font-bold uppercase text-primary">Feedback</p>
-                <h2 class="mt-1 text-3xl font-extrabold text-base-content md:text-4xl">@ViewData["AppName"]</h2>
-                <p class="mt-2 text-base text-base-content/70">Search existing issues or submit a new piece of feedback.</p>
-            </div>
-            <a class="btn btn-outline btn-primary" asp-action="Index">All apps</a>
-        </div>
+            <div class="flex items-center gap-4">
+                <img class="mt-1 h-10 w-10 shrink-0 object-contain" src="@Url.Content(appInfo.IconPath)" alt=""
+                     aria-hidden="true" />
+                <div>
 
-        <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
-            <div class="space-y-4">
-                <partial name="SearchBarPartial" />
-
-                <section class="rounded-lg border border-main-border bg-base-100 p-5 shadow-sm">
-                    <div class="mb-4 flex items-center justify-between gap-4">
-                        <h3 class="text-xl font-extrabold">Open issues</h3>
-                        <span class="badge badge-primary">@Model.Count</span>
+                    <h2 class="text-3xl font-extrabold text-base-content md:text-4xl">@appInfo.Name</h2>
+                    <p class="mt-1 text-base text-base-content/70">Search existing issues or submit a new piece of
+                        feedback.</p>
                     </div>
-                    <partial name="DisplayIssuesPartial" model="Model" />
-                </section>
+                </div>
+                <a class="btn btn-outline btn-default" asp-action="Index">All apps</a>
             </div>
 
-            <partial name="NewIssuePartial" />
-        </div>
-    </section>
-</div>
+            <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
+                <div class="space-y-4">
+                    <partial name="SearchBarPartial" />
+
+                    <section class="rounded-lg border border-main-border bg-base-100 p-5 shadow-sm">
+                        <div class="mb-4 flex items-center justify-between gap-4">
+                            <h3 class="text-xl font-extrabold">Open issues</h3>
+                            <span class="badge badge-primary">@Model.Count</span>
+                        </div>
+                        <partial name="DisplayIssuesPartial" model="Model" />
+                    </section>
+                </div>
+
+                <partial name="NewIssuePartial" />
+            </div>
+        </section>
+    </div>

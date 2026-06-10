@@ -1,12 +1,9 @@
-<section class="rounded-lg border border-main-border bg-base-100 p-4 shadow-sm">
+<section>
     <form asp-action="Search" asp-controller="Home" method="post" class="flex flex-col gap-3 sm:flex-row">
         <input type="hidden" name="appName" value="@ViewData["AppName"]" />
         <label class="sr-only" for="searchInput">Search issues</label>
-        <input class="input input-bordered min-h-12 flex-1 rounded-md bg-base-100"
-               type="search"
-               id="searchInput"
-               placeholder="Search issues..."
-               name="searchInput" />
+        <input class="input input-bordered min-h-12 flex-1 rounded-md bg-base-100" type="search" id="searchInput"
+               placeholder="Search issues..." name="searchInput" />
         <button class="btn btn-primary min-h-12 rounded-md" type="submit">Search</button>
     </form>
 </section>
