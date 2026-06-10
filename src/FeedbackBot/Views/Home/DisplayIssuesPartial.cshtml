@@ -6,7 +6,7 @@
 
 @if (Model.Count == 0)
 {
-    <div class="rounded-md border border-dashed border-main-border bg-base-200 p-8 text-center">
+    <div class="rounded-md border border-dashed border-main-border bg-base-100 p-8 text-center">
         <p class="font-bold text-base-content">No issues found</p>
         <p class="mt-1 text-sm text-base-content/70">Try another search or submit new feedback.</p>
     </div>
@@ -19,9 +19,7 @@ else
             <article class="rounded-md border border-main-border bg-base-200 p-5 transition hover:border-primary/30">
                 <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                     <div class="flex min-w-0 flex-1 gap-4">
-                        <img class="mt-1 h-8 w-8 shrink-0 object-contain"
-                             src="@Url.Content(appInfo.IconPath)"
-                             alt=""
+                        <img class="mt-1 h-8 w-8 shrink-0 object-contain" src="@Url.Content(appInfo.IconPath)" alt=""
                              aria-hidden="true" />
                         <div class="min-w-0 flex-1">
                             <a class="group inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
@@ -36,7 +34,8 @@ else
                     <div class="flex shrink-0 flex-col gap-3 xl:w-48">
                         <div class="rounded-md bg-base-100 p-3 text-sm">
                             <p class="font-bold">@issue.NumOfVotes vote(s)</p>
-                            <p class="mt-1 truncate text-base-content/60" title="@issue.StringOfVoters">by @issue.StringOfVoters</p>
+                            <p class="mt-1 truncate text-base-content/60" title="@issue.StringOfVoters">by @issue.StringOfVoters
+                            </p>
                         </div>
                         <div class="flex gap-2">
                             <form asp-action="Vote" asp-controller="Home" method="post" class="flex-1">
