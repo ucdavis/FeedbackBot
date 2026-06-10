@@ -24,6 +24,13 @@
         </div>
 
         <div class="space-y-4">
+            @if (ViewData["GitHubError"] != null)
+            {
+                <div class="alert alert-info rounded-md">
+                    <span>@ViewData["GitHubError"]</span>
+                </div>
+            }
+
             <partial name="SearchBarPartial" />
             <section class="rounded-lg border border-main-border bg-base-100 p-5 shadow-sm">
                 <partial name="DisplayIssuesPartial" model="Model" />

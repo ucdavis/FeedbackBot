@@ -18,14 +18,21 @@
                         feedback.</p>
                     </div>
                 </div>
-                <a class="btn btn-outline btn-default" asp-action="Index">All apps</a>
+                <a class="btn btn-outline btn-primary" asp-action="Index">All apps</a>
             </div>
 
-            <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
-                <div class="space-y-4">
-                    <partial name="SearchBarPartial" />
+        <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
+            <div class="space-y-4">
+                @if (ViewData["GitHubError"] != null)
+                {
+                    <div class="alert alert-info rounded-md">
+                        <span>@ViewData["GitHubError"]</span>
+                    </div>
+                }
 
-                    <section class="rounded-lg border border-main-border bg-base-100 p-5 shadow-sm">
+                <partial name="SearchBarPartial" />
+
+                <section class="rounded-lg border border-main-border bg-base-100 p-5 shadow-sm">
                         <div class="mb-4 flex items-center justify-between gap-4">
                             <h3 class="text-xl font-extrabold">Open issues</h3>
                             <span class="badge badge-primary">@Model.Count</span>

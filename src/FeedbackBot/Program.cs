@@ -22,10 +22,17 @@ namespace FeedbackBot
                 : currentDirectory;
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
 
-            var configuration = new ConfigurationBuilder()
+            var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(contentRoot)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
-                .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: false)
+                .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: false);
+
+            if (environment == "Development")
+            {
+                configurationBuilder.AddUserSecrets<Program>(optional: true);
+            }
+
+            var configuration = configurationBuilder
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
                 .Build();
