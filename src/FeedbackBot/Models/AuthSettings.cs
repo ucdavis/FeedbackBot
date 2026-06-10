@@ -8,6 +8,5 @@ namespace FeedbackBot.Models
     public class AuthSettings
     {
         public string CasBaseUrl { get; set; }
-        public bool UseLocalAuth { get; set; }
     }
 }

@@ -34,12 +34,6 @@ namespace FeedbackBot.Controllers
         [Route("login")]
         public async Task<IActionResult> Login(string returnUrl = "/", string ticket = null)
         {
-            if (_authSettings.UseLocalAuth)
-            {
-                await SignInUser("local-dev");
-                return LocalRedirect(GetSafeReturnUrl(returnUrl));
-            }
-
             var serviceUrl = BuildServiceUrl(returnUrl);
             if (string.IsNullOrWhiteSpace(ticket))
             {
@@ -63,11 +57,6 @@ namespace FeedbackBot.Controllers
         public async Task<ActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            if (_authSettings.UseLocalAuth)
-            {
-                return RedirectToAction("Index", "Home");
-            }
 
             return Redirect($"{_authSettings.CasBaseUrl}logout");
         }

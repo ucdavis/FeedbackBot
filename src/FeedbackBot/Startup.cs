@@ -1,7 +1,5 @@
 using FeedbackBot.Models;
-using FeedbackBot.Security;
 using FeedbackBot.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -39,28 +37,15 @@ namespace FeedbackBot
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            var useLocalAuth = Configuration.GetValue<bool>("Authentication:UseLocalAuth");
-            var authenticationBuilder = services.AddAuthentication(options =>
+            services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = useLocalAuth
-                    ? LocalAuthenticationHandler.SchemeName
-                    : CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = useLocalAuth
-                    ? LocalAuthenticationHandler.SchemeName
-                    : CookieAuthenticationDefaults.AuthenticationScheme;
-            });
-
-            authenticationBuilder.AddCookie(options =>
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            })
+            .AddCookie(options =>
             {
                 options.LoginPath = new PathString("/login");
             });
-
-            if (useLocalAuth)
-            {
-                authenticationBuilder.AddScheme<AuthenticationSchemeOptions, LocalAuthenticationHandler>(
-                    LocalAuthenticationHandler.SchemeName,
-                    options => { });
-            }
 
             services.AddMvc();
         }
