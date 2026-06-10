@@ -1,20 +1,20 @@
 ﻿<!DOCTYPE html>
 <html data-theme="feedbackbot" lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - FeedbackBot</title>
     <link rel="stylesheet" href="~/css/tailwind.css" asp-append-version="true" />
 </head>
+
 <body class="min-h-screen bg-base-200 text-base-content">
     <div class="flex min-h-screen flex-col">
         <main class="flex-1">
-            <header class="mx-auto mb-8 w-[92%] max-w-[1440px]">
+            <header class="container">
                 <div class="flex flex-col gap-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                     <a class="flex items-center gap-4 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                       asp-area=""
-                       asp-controller="Home"
-                       asp-action="Index">
+                       asp-area="" asp-controller="Home" asp-action="Index">
                         <img class="h-12 w-auto" src="~/media/logo_feedbackbot.svg" alt="FeedbackBot logo" />
                         <div>
                             <h1 class="text-xl font-extrabold leading-tight">FeedbackBot</h1>
@@ -22,12 +22,9 @@
                         </div>
                     </a>
                     <nav class="flex items-center gap-4 text-sm font-semibold">
-                        <a class="text-base-content/70 transition hover:text-primary"
-                           asp-area=""
-                           asp-controller="Home"
+                        <a class="text-base-content/70 transition hover:text-primary" asp-area="" asp-controller="Home"
                            asp-action="Index">Home</a>
-                        <a class="text-base-content/70 transition hover:text-primary"
-                           asp-controller="Account"
+                        <a class="text-base-content/70 transition hover:text-primary" asp-controller="Account"
                            asp-action="Logout">Sign out</a>
                     </nav>
                 </div>
@@ -41,4 +38,5 @@
 
     @RenderSection("scripts", required: false)
 </body>
+
 </html>

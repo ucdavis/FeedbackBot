@@ -62,6 +62,32 @@ html {
   animation: blue-float-drift 8s ease-in-out infinite;
 }
 
+.container {
+  padding: 0;
+  width: 94%;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .container {
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .container {
+    width: 92%;
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 1025px) {
+  .container {
+    width: 90%;
+    max-width: 1440px;
+  }
+}
+
 @keyframes blue-float-drift {
   0% {
     transform: translate(0, 0);

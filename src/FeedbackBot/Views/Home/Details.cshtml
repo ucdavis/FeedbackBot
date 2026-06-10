@@ -4,7 +4,8 @@
     ViewData["Title"] = "Issue";
 }
 
-<section class="mx-auto w-[92%] max-w-[960px]">
+<div class="container">
+<section>
     <div class="mb-6">
         <a class="text-sm font-bold uppercase text-primary hover:underline"
            href="@Url.Action("App", new { appName = ViewData["AppName"] })">Back to @ViewData["AppName"]</a>
@@ -87,3 +88,4 @@
         }
     </section>
 </section>
+</div>

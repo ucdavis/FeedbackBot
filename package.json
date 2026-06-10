@@ -7,7 +7,8 @@
     "build": "npm run build:css && dotnet build",
     "build:css": "tailwindcss -i ./src/FeedbackBot/Styles/app.css -o ./src/FeedbackBot/wwwroot/css/tailwind.css --minify",
     "watch:css": "tailwindcss -i ./src/FeedbackBot/Styles/app.css -o ./src/FeedbackBot/wwwroot/css/tailwind.css --watch",
-    "dev": "dotnet run --project src/FeedbackBot/FeedbackBot.csproj"
+    "dev:css": "npm run watch:css",
+    "dev": "dotnet watch --project src/FeedbackBot/FeedbackBot.csproj run"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.18",
