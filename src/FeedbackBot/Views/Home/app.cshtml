@@ -1,22 +1,32 @@
 @model IReadOnlyList<FeedbackBot.Models.IssueContainer>
 
-<div class="bodyDiv">
-    @{
-        ViewData["Title"] = "Home Page";
-        <h3 class="pageTitle">Submit a new feedback for @ViewData["AppName"]</h3>
-    }
+@{
+    ViewData["Title"] = ViewData["AppName"];
+}
 
-    @{
-        Html.RenderPartial("SearchBarPartial");
-    }
+<section class="mx-auto w-[92%] max-w-[1440px]">
+    <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+            <p class="text-sm font-bold uppercase text-primary">Feedback</p>
+            <h2 class="mt-1 text-3xl font-extrabold text-base-content md:text-4xl">@ViewData["AppName"]</h2>
+            <p class="mt-2 text-base text-base-content/70">Search existing issues or submit a new piece of feedback.</p>
+        </div>
+        <a class="btn btn-outline btn-primary" asp-action="Index">All apps</a>
+    </div>
 
-    @{
-        Html.RenderPartial("NewIssuePartial");
-    }
+    <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
+        <div class="space-y-4">
+            <partial name="SearchBarPartial" />
 
-    <h3 class="pageTitle">@ViewData["AppName"]</h3>
+            <section class="rounded-lg border border-main-border bg-base-100 p-5 shadow-sm">
+                <div class="mb-4 flex items-center justify-between gap-4">
+                    <h3 class="text-xl font-extrabold">Open issues</h3>
+                    <span class="badge badge-primary">@Model.Count</span>
+                </div>
+                <partial name="DisplayIssuesPartial" model="Model" />
+            </section>
+        </div>
 
-    @{
-        Html.RenderPartial("DisplayIssuesPartial");
-    }
-</div>
+        <partial name="NewIssuePartial" />
+    </div>
+</section>

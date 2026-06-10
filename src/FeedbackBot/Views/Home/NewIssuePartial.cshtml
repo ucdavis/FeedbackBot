@@ -1,18 +1,33 @@
-
-<div class="newWrapper">
-    <div id="newIssueBox">
-        @using (Html.BeginForm("createIssue", "Home", new { appName = ViewData["AppName"] }))
-        {
-            <input type="hidden" name="appName" value="@ViewData["AppName"]" />
-
-            <div class="user">
-                <p class="user_name"></p>
-            </div>
-            <input type="text" id="title-input" placeholder="Title" name="title" />
-            <textarea placeholder="Type a new feedback" id="descriptionTextBox" type="text" name="description"></textarea>
-            <br />
-            <br />
-            <button type="submit">Submit</button>
-        }
+<section class="rounded-lg border border-main-border bg-base-100 p-5 shadow-sm lg:sticky lg:top-4 lg:self-start">
+    <div class="mb-4">
+        <h3 class="text-xl font-extrabold">Submit feedback</h3>
+        <p class="mt-1 text-sm text-base-content/70">Create a new GitHub issue for @ViewData["AppName"].</p>
     </div>
-</div>
+
+    <form asp-action="CreateIssue" asp-controller="Home" method="post" class="space-y-4">
+        <input type="hidden" name="appName" value="@ViewData["AppName"]" />
+
+        <div>
+            <label class="label" for="title-input">
+                <span class="label-text font-bold">Title</span>
+            </label>
+            <input class="input input-bordered min-h-12 w-full rounded-md bg-base-100"
+                   type="text"
+                   id="title-input"
+                   placeholder="Short summary"
+                   name="title" />
+        </div>
+
+        <div>
+            <label class="label" for="descriptionTextBox">
+                <span class="label-text font-bold">Description</span>
+            </label>
+            <textarea class="textarea textarea-bordered min-h-44 w-full rounded-md bg-base-100"
+                      placeholder="Type new feedback"
+                      id="descriptionTextBox"
+                      name="description"></textarea>
+        </div>
+
+        <button class="btn btn-primary w-full rounded-md" type="submit">Submit</button>
+    </form>
+</section>

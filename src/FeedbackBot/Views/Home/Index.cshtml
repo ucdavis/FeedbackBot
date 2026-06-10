@@ -1,82 +1,40 @@
 @{
     ViewData["Title"] = "Welcome";
-}
-<div class="welcome">
-    <h3>@ViewData["Message"]</h3>
 
-    <p>Welcome to feedback! This is a website to keep track of user feedback of various applications of UC Davis.</p>
-</div>
-<div class="flexContainer">
-    <div class="landingCard">
-        <div class="leftLanding">
-            <p class="title">PrePurchasing</p>
-            <p class="description">PrePurchasing allows users to submit any type of order request, including KFS, MyTravel, and other campus services.</p>
-            <a href="@Url.Action("App", new {appName = "Purchasing"})">
-                <button>view issues</button>
-            </a>
-        </div>
+    var apps = new[]
+    {
+        new { Name = "PrePurchasing", AppName = "Purchasing", Description = "Submit order requests for KFS, MyTravel, and other campus services." },
+        new { Name = "ACE", AppName = "Ace", Description = "Academic Course Evaluation makes course evaluations easier for students, faculty, and staff." },
+        new { Name = "FeedbackBot", AppName = "feedbackBot", Description = "Collect and route user feedback directly into the GitHub issue workflow." },
+        new { Name = "Online Registration", AppName = "Crp", Description = "Manage event registration and collect fees for departments." },
+        new { Name = "PEAKS", AppName = "Peaks", Description = "Track people, equipment, access, keys, and space." },
+        new { Name = "Finjector", AppName = "finjector", Description = "Build, share, and use Aggie Enterprise chart strings." },
+        new { Name = "Hippo", AppName = "hippo", Description = "High Performance Computing Personnel Onboarding." },
+        new { Name = "Walter", AppName = "walter", Description = "Warehouse Analytics and Ledger Tools for Enterprise Reporting." }
+    };
+}
+
+<section class="mx-auto w-[92%] max-w-[1440px]">
+    <div class="mb-10 max-w-3xl">
+        <p class="text-sm font-bold uppercase text-primary">FeedbackBot</p>
+        <h2 class="mt-2 text-4xl font-extrabold leading-tight text-base-content md:text-5xl">Track feedback where the work happens.</h2>
+        <p class="mt-4 text-lg text-base-content/70">Collect user feedback for UC Davis applications, review active issues, and help teams prioritize what needs attention next.</p>
     </div>
-    <div class="landingCard">
-        <div class="leftLanding">
-            <p class="title">ACE</p>
-            <p class="description">Academic Course Evaluation (ACE) makes course evaluations easier for students, faculty, and staff.</p>
-            <a href="@Url.Action("App", new {appName = "Ace"})">
-                <button>view issues</button>
+
+    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        @foreach (var app in apps)
+        {
+            <a class="group flex min-h-56 flex-col justify-between rounded-lg border border-main-border bg-base-100 p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+               href="@Url.Action("App", new { appName = app.AppName })">
+                <div>
+                    <h3 class="text-xl font-extrabold text-base-content">@app.Name</h3>
+                    <p class="mt-3 text-sm leading-6 text-base-content/70">@app.Description</p>
+                </div>
+                <span class="mt-6 inline-flex items-center text-sm font-bold uppercase text-primary">
+                    View issues
+                    <span class="ms-2 transition group-hover:translate-x-1">&rarr;</span>
+                </span>
             </a>
-        </div>
+        }
     </div>
-    <div class="landingCard">
-        <div class="leftLanding">
-            <p class="title">FeedbackBot</p>
-            <p class="description">Hello this is an app called feedbackbot it does stuff related to giving feedback automatically to our team directly into the github repo</p>
-            <a href="@Url.Action("App", new {appName = "feedbackBot"})">
-                <button>view issues</button>
-            </a>
-        </div>
-    </div>
-    <div class="landingCard">
-        <div class="leftLanding">
-            <p class="title">Online Registration</p>
-            <p class="description">Online Registration allows departments to manage and collect fees for events.</p>
-            <a href="@Url.Action("App", new {appName = "Crp"})">
-                <button>view issues</button>
-            </a>
-        </div>
-    </div>
-    <div class="landingCard">
-        <div class="leftLanding">
-            <p class="title">PEAKS</p>
-            <p class="description">People, Equipment, Access, Keys and Space Tracking application</p>
-            <a href="@Url.Action("App", new {appName = "Peaks"})">
-                <button>view issues</button>
-            </a>
-        </div>
-    </div>
-    <div class="landingCard">
-        <div class="leftLanding">
-            <p class="title">Finjector</p>
-            <p class="description">Finjector is a tool to help you build, share, and use the new Aggie Enterprise Chart strings.</p>
-            <a href="@Url.Action("App", new {appName = "finjector"})">
-                <button>view issues</button>
-            </a>
-        </div>
-    </div>
-    <div class="landingCard">
-        <div class="leftLanding">
-            <p class="title">Hippo</p>
-            <p class="description">High Performance Computing Personnel Onboarding.</p>
-            <a href="@Url.Action("App", new {appName = "hippo"})">
-                <button>view issues</button>
-            </a>
-        </div>
-    </div>
-    <div class="landingCard">
-        <div class="leftLanding">
-            <p class="title">Walter</p>
-            <p class="description">Warehouse Analytics and Ledger Tools for Enterprise Reporting.</p>
-            <a href="@Url.Action("App", new {appName = "walter"})">
-                <button>view issues</button>
-            </a>
-        </div>
-    </div>
-</div>
+</section>

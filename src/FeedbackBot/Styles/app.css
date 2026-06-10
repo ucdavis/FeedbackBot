@@ -52,3 +52,26 @@
   --color-warning: var(--color-warning-color);
   --color-warning-content: var(--color-light-font);
 }
+
+#blue_float {
+  transform-origin: center;
+  animation: blue-float-drift 8s ease-in-out infinite;
+}
+
+@keyframes blue-float-drift {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(3px, -4px);
+  }
+  50% {
+    transform: translate(-2px, -6px);
+  }
+  75% {
+    transform: translate(4px, 2px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}

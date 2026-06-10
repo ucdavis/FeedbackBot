@@ -4,81 +4,86 @@
     ViewData["Title"] = "Issue";
 }
 
-<h3>@ViewData["Message"]</h3>
-
-
-@if (Model.VoteMessage != null)
-{
-    <div class="alert alert-info" role="alert">@Model.VoteMessage</div>
-}
-<br />
-
-<center>
-    <a href="@Url.Action("App", new {appName = ViewData["AppName"]})">Back</a>
-</center>
-
-<div class="commentWrapper">
-    <div id="newIssueBox">
-        <div class="commentIssue">
-            <div class="rightCard">
-                <h3 class="title">@Model.Issue.Title</h3>
-
-                <div class="description">
-                    <p class="user_name">by @Model.Issue.Author</p>
-                    <br />
-
-                </div>
-                <div class="border-wrap">
-                    <span>@Model.Issue.Body</span><br />
-                </div>
-
-                <div class="vote">
-                    <p>
-                        <b>Upvoted by:</b>
-                        @Model.Issue.StringOfVoters
-                    </p>
-                    <br>
-                    <div class="voteButton">
-                        @using (Html.BeginForm("vote", "Home"))
-                        {
-                            <input type="text" class="voteID" name="voteID" value="@Model.Issue.Number" style="display:none;" />
-                            <input type="text" name="appName" value="@ViewData["AppName"]" style="display:none;" />
-                            <input type="submit" class="buttonID" value="@Model.Issue.VoteState" id="@Model.Issue.Number" />
-
-                        }
-                        <p class="voteNum"> | </p>
-                        <p class="voteNum">@Model.Issue.NumOfVotes</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+<section class="mx-auto w-[92%] max-w-[960px]">
+    <div class="mb-6">
+        <a class="text-sm font-bold uppercase text-primary hover:underline"
+           href="@Url.Action("App", new { appName = ViewData["AppName"] })">Back to @ViewData["AppName"]</a>
     </div>
-</div>
-<div id="newCommentBox">
-    <h4>Submit New Comment</h4><br />
-    <div class="commentCard">
-        @using (Html.BeginForm("addComment", "Home"))
-            {
-            <textarea placeholder="Type your comment here" id="descriptionTextBoxComment" type="text" name="comment" value="@Model.Issue.Number" class="commentBox"></textarea> <br>
-            <button type="submit" id="@Model.Issue.Number">Submit</button>
-            <input type="text" class="voteID" name="voteID" value="@Model.Issue.Number" style="display:none;" /><br />
-            <input type="text" name="appName" value="@ViewData["AppName"]" style="display:none;" /><br />
-        }
-    </div>
-</div>
 
-<div class="currentComment">
-    @foreach (var comment in Model.Comments)
+    @if (Model.VoteMessage != null)
     {
-        <div id="newIssueBox">
-            <div class="issueComment">
-                <div class="rightCard">
-                    <div><b>Date Created: </b> @comment.CreateDate</div><br />
-                    <div><b>Comment: </b>@comment.Body</div><br />
-                    <div><b>Author: </b>@comment.Author</div><br /><br />
-                </div>
-            </div>
+        <div class="alert alert-info mb-6 rounded-md">
+            <span>@Model.VoteMessage</span>
         </div>
     }
-    <br />
-</div>
+
+    <article class="rounded-lg border border-main-border bg-base-100 p-6 shadow-sm">
+        <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+            <div class="min-w-0 flex-1">
+                <p class="text-sm font-bold uppercase text-primary">Issue #@Model.Issue.Number</p>
+                <h2 class="mt-2 text-3xl font-extrabold leading-tight">@Model.Issue.Title</h2>
+                <p class="mt-2 text-sm text-base-content/60">by @Model.Issue.Author</p>
+                <div class="mt-6 rounded-md bg-base-200 p-4">
+                    <p class="whitespace-pre-line text-sm leading-6 text-base-content/80">@Model.Issue.Body</p>
+                </div>
+            </div>
+
+            <aside class="w-full rounded-md bg-base-200 p-4 md:w-56">
+                <p class="text-2xl font-extrabold">@Model.Issue.NumOfVotes</p>
+                <p class="text-sm font-semibold text-base-content/60">vote(s)</p>
+                <p class="mt-3 text-xs uppercase text-base-content/50">Upvoted by</p>
+                <p class="mt-1 break-words text-sm text-base-content/70">@Model.Issue.StringOfVoters</p>
+
+                <form asp-action="Vote" asp-controller="Home" method="post" class="mt-4">
+                    <input type="hidden" name="voteID" value="@Model.Issue.Number" />
+                    <input type="hidden" name="appName" value="@ViewData["AppName"]" />
+                    <button type="submit" class="btn btn-primary w-full rounded-md">@Model.Issue.VoteState</button>
+                </form>
+            </aside>
+        </div>
+    </article>
+
+    <section class="mt-6 rounded-lg border border-main-border bg-base-100 p-6 shadow-sm">
+        <h3 class="text-xl font-extrabold">Add a comment</h3>
+        <form asp-action="AddComment" asp-controller="Home" method="post" class="mt-4 space-y-4">
+            <input type="hidden" name="voteID" value="@Model.Issue.Number" />
+            <input type="hidden" name="appName" value="@ViewData["AppName"]" />
+            <label class="sr-only" for="descriptionTextBoxComment">Comment</label>
+            <textarea class="textarea textarea-bordered min-h-36 w-full rounded-md bg-base-100"
+                      placeholder="Type your comment here"
+                      id="descriptionTextBoxComment"
+                      name="comment"></textarea>
+            <button class="btn btn-primary rounded-md" type="submit">Submit</button>
+        </form>
+    </section>
+
+    <section class="mt-6">
+        <div class="mb-4 flex items-center justify-between">
+            <h3 class="text-xl font-extrabold">Comments</h3>
+            <span class="badge badge-primary">@Model.Comments.Count</span>
+        </div>
+
+        @if (Model.Comments.Count == 0)
+        {
+            <div class="rounded-md border border-dashed border-main-border bg-base-100 p-8 text-center">
+                <p class="font-bold">No comments yet</p>
+                <p class="mt-1 text-sm text-base-content/70">Start the conversation with the form above.</p>
+            </div>
+        }
+        else
+        {
+            <div class="space-y-4">
+                @foreach (var comment in Model.Comments)
+                {
+                    <article class="rounded-md border border-main-border bg-base-100 p-5 shadow-sm">
+                        <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                            <p class="font-bold">@comment.Author</p>
+                            <p class="text-sm text-base-content/60">@comment.CreateDate</p>
+                        </div>
+                        <p class="mt-4 whitespace-pre-line text-sm leading-6 text-base-content/80">@comment.Body</p>
+                    </article>
+                }
+            </div>
+        }
+    </section>
+</section>

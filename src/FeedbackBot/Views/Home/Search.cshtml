@@ -1,21 +1,24 @@
 @model IReadOnlyList<FeedbackBot.Models.IssueContainer>
 
-<div class="bodyDiv">
-    @{
-        ViewData["Title"] = "Home Page";
-    }
+@{
+    ViewData["Title"] = "Search";
+}
 
-    <br />
+<section class="mx-auto w-[92%] max-w-[1440px]">
+    <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+            <a class="text-sm font-bold uppercase text-primary hover:underline"
+               href="@Url.Action("App", new { appName = ViewData["AppName"] })">Back to @ViewData["AppName"]</a>
+            <h2 class="mt-2 text-3xl font-extrabold text-base-content md:text-4xl">Search results</h2>
+            <p class="mt-2 text-base text-base-content/70">Results for "@ViewData["SearchTerm"]" in @ViewData["AppName"].</p>
+        </div>
+        <span class="badge badge-primary">@Model.Count</span>
+    </div>
 
-    <a href="@Url.Action("App", new { appName = ViewData["AppName"] })">Back</a>
-
-    <h3 class="pageTitle">Search Results For @ViewData["SearchTerm"] in <a href="@Url.Action("App", new { appName = ViewData["AppName"] })">@ViewData["AppName"]</a></h3>
-
-    @{
-        Html.RenderPartial("SearchBarPartial");
-    }
-
-    @{
-        Html.RenderPartial("DisplayIssuesPartial");
-    }
-</div>
+    <div class="space-y-4">
+        <partial name="SearchBarPartial" />
+        <section class="rounded-lg border border-main-border bg-base-100 p-5 shadow-sm">
+            <partial name="DisplayIssuesPartial" model="Model" />
+        </section>
+    </div>
+</section>
