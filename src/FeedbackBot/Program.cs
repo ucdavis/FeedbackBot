@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore;
+using System;
+using System.IO;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 
 namespace FeedbackBot
 {
@@ -9,22 +10,31 @@ namespace FeedbackBot
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            CreateWebHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((context, config) =>
-                {
-                    var env = context.HostingEnvironment;
-                    if(env.IsDevelopment())
-                    {
-                        config.AddUserSecrets<Program>();
-                    }
-                })
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        {
+            var currentDirectory = Directory.GetCurrentDirectory();
+            var projectDirectory = Path.Combine(currentDirectory, "src", "FeedbackBot");
+            var contentRoot = File.Exists(Path.Combine(projectDirectory, "appsettings.json"))
+                ? projectDirectory
+                : currentDirectory;
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(contentRoot)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: false)
+                .AddEnvironmentVariables()
+                .AddCommandLine(args)
+                .Build();
+
+            return new WebHostBuilder()
+                .UseKestrel()
+                .UseContentRoot(contentRoot)
+                .UseConfiguration(configuration)
+                .UseStartup<Startup>();
+        }
     }
 }

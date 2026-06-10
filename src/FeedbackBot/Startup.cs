@@ -1,11 +1,11 @@
-﻿using AspNetCore.Security.CAS;
 using FeedbackBot.Models;
+using FeedbackBot.Security;
 using FeedbackBot.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,49 +21,50 @@ namespace FeedbackBot
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // global configuration
             services.AddSingleton<IConfiguration>(_ => Configuration);
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
             services.Configure<AuthSettings>(Configuration.GetSection("Authentication"));
 
-            // infrastructure
+            services.AddHttpClient();
             services.AddTransient<IGitHubService, GitHubService>();
 
-            // caching
             services.AddDistributedMemoryCache();
+            services.AddSession();
 
-            // sessions
-            services.AddSession(/* options go here */);
-            
             services.Configure<CookiePolicyOptions>(options =>
             {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            // add cas auth backed by a cookie signin scheme
-            services.AddAuthentication(options =>
+            var useLocalAuth = Configuration.GetValue<bool>("Authentication:UseLocalAuth");
+            var authenticationBuilder = services.AddAuthentication(options =>
             {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            })
-            .AddCookie(options =>
-                {
-                    options.LoginPath = new PathString("/login");
-                })
-            .AddCAS(options =>
-            {
-                options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.CasServerUrlBase = Configuration["Authentication:CasBaseUrl"];
+                options.DefaultAuthenticateScheme = useLocalAuth
+                    ? LocalAuthenticationHandler.SchemeName
+                    : CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = useLocalAuth
+                    ? LocalAuthenticationHandler.SchemeName
+                    : CookieAuthenticationDefaults.AuthenticationScheme;
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            authenticationBuilder.AddCookie(options =>
+            {
+                options.LoginPath = new PathString("/login");
+            });
+
+            if (useLocalAuth)
+            {
+                authenticationBuilder.AddScheme<AuthenticationSchemeOptions, LocalAuthenticationHandler>(
+                    LocalAuthenticationHandler.SchemeName,
+                    options => { });
+            }
+
+            services.AddMvc();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -73,7 +74,6 @@ namespace FeedbackBot
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -84,7 +84,8 @@ namespace FeedbackBot
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(routes => {
+            app.UseEndpoints(routes =>
+            {
                 routes.MapDefaultControllerRoute();
             });
         }
