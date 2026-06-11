@@ -44,7 +44,7 @@
                                 </div>
                             </div>
 
-                            <p class="mt-4 whitespace-pre-line leading-relaxed">@Model.Issue.Body</p>
+                            <p class="mt-4 max-w-148 whitespace-pre-line leading-relaxed">@Model.Issue.Body</p>
 
                         </div>
 
@@ -77,7 +77,7 @@
                 <section class="mt-6">
                     <div class="mb-4 flex items-center justify-between">
                         <h3 class="text-xl font-extrabold">@Model.Comments.Count @(Model.Comments.Count == 1 ? "Comment" :
-                                                                                                                                                                                                                                                                                                                                                                                                                                                     "Comments")</h3>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         "Comments")</h3>
                         </div>
 
                         @if (Model.Comments.Count == 0)
