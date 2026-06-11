@@ -16,11 +16,10 @@ else
     <div class="space-y-4">
         @foreach (var issue in Model)
         {
-            <article class="rounded-md border border-main-border bg-base-200 p-5 transition hover:border-primary/30">
+            <article class="rounded-md border border-main-border bg-base-100 p-5 transition hover:border-primary/30">
                 <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                     <div class="flex min-w-0 flex-1 gap-4">
-                        <img class="mt-1 h-8 w-8 shrink-0 object-contain" src="@Url.Content(appInfo.IconPath)" alt=""
-                             aria-hidden="true" />
+
                         <div class="min-w-0 flex-1">
                             <a class="group inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                                href="@Url.Action("Details", new { appName = ViewData["AppName"], id = issue.Number })">

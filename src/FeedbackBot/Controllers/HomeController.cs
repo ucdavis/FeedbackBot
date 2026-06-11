@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using FeedbackBot.Models;
@@ -12,7 +13,7 @@ namespace FeedbackBot.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private const string GitHubRateLimitMessage = "GitHub API rate limit exceeded. Add a GitHub token to your local user secrets and restart the app.";
+        private const string GitHubRateLimitMessage = "We couldn't load feedback right now. Please try again later.";
         private readonly IGitHubService _gitHubService;
 
         public HomeController(IGitHubService gitHubService)
@@ -20,9 +21,26 @@ namespace FeedbackBot.Controllers
             _gitHubService = gitHubService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             ViewData["Message"] = "Welcome";
+
+            var issueCounts = new Dictionary<string, int>();
+
+            try
+            {
+                foreach (var app in AppCatalog.Apps)
+                {
+                    var issues = await _gitHubService.GetIssues(app.AppName);
+                    issueCounts[app.AppName] = issues.Count();
+                }
+            }
+            catch (RateLimitExceededException)
+            {
+                ViewData["GitHubError"] = GitHubRateLimitMessage;
+            }
+
+            ViewData["IssueCounts"] = issueCounts;
 
             return View();
         }
