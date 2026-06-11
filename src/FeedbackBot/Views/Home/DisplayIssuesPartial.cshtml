@@ -17,7 +17,7 @@ else
         @foreach (var issue in Model)
         {
             <article class="rounded-md border border-main-border bg-base-100 p-5 transition hover:border-primary/30">
-                <div class="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
+                <div class="flex flex-col gap-6 xl:flex-row items-end xl:justify-between">
                     <div class="flex min-w-0 flex-1">
 
                         <div class="min-w-0 flex-1">
@@ -25,15 +25,16 @@ else
                                href="@Url.Action("Details", new { appName = ViewData["AppName"], id = issue.Number })">
                                 <h4 class="text-xl font-extrabold text-base-content group-hover:text-primary">@issue.Title</h4>
                             </a>
-                            <p class="mt-1 text-base-content/70">by @issue.Author</p>
+                            <p class="text-base-content/70">by @issue.Author</p>
                             <p class="mt-4 whitespace-pre-line leading-relaxed">@issue.Body</p>
                         </div>
                     </div>
 
-                    <div class="flex shrink-0 flex-col gap-3 xl:w-48">
-                        <div class="rounded-md bg-base-100 p-3 text-sm">
-                            <p class="font-bold">@issue.NumOfVotes vote(s)</p>
-                            <p class="mt-1 truncate text-base-content/60" title="@issue.StringOfVoters">by @issue.StringOfVoters
+                    <div class="flex shrink-0 flex-col gap-5 xl:w-48">
+                        <div class="rounded-md">
+                            <p class="font-bold text-lg">@issue.NumOfVotes vote(s)</p>
+                            <p class="mt-1 truncate text-base-content/70" title="@issue.StringOfVoters">by
+                                @issue.StringOfVoters
                             </p>
                         </div>
                         <div class="flex gap-2">

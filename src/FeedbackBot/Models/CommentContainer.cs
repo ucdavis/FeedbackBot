@@ -14,7 +14,7 @@ namespace FeedbackBot.Models
         public void Deserialize(IssueComment comment, string bodyComment)
         {
            
-            Body = bodyComment;
+            Body = bodyComment.Trim();
         
             var indexOfAuthor = comment.Body.IndexOf("Author:");
 
