@@ -18,31 +18,32 @@
                         feedback.</p>
                     </div>
                 </div>
-                <a class="btn btn-primary" href="https://computing.caes.ucdavis.edu/documentation">View Documentation</a>
-            </div>
-
-            <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
-                <div class="space-y-4">
-                    @if (ViewData["GitHubError"] != null)
-                    {
-                        <div class="alert alert-info rounded-md">
-                            <span>@ViewData["GitHubError"]</span>
-                        </div>
-                    }
-
-                    <partial name="SearchBarPartial" />
-
-                    <section>
-                        <div class="mt-6 mb-4 flex items-center gap-4">
-                            <span class="shrink-0 text-xl font-bold text-base-content">
-                                @Model.Count @(Model.Count == 1 ? "issue" : "issues")
-                            </span>
-                        </div>
-                        <partial name="DisplayIssuesPartial" model="Model" />
-                    </section>
+                <a class="btn btn-outline btn-primary" href="https://computing.caes.ucdavis.edu/documentation">View
+                    Documentation</a>
                 </div>
 
-                <partial name="NewIssuePartial" />
-            </div>
-        </section>
-    </div>
+                <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
+                    <div class="space-y-4">
+                        @if (ViewData["GitHubError"] != null)
+                        {
+                            <div class="alert alert-info rounded-md">
+                                <span>@ViewData["GitHubError"]</span>
+                            </div>
+                        }
+
+                        <partial name="SearchBarPartial" />
+
+                        <section>
+                            <div class="mt-6 mb-4 flex items-center gap-4">
+                                <span class="shrink-0 text-xl font-bold text-base-content">
+                                    @Model.Count @(Model.Count == 1 ? "issue" : "issues")
+                                </span>
+                            </div>
+                            <partial name="DisplayIssuesPartial" model="Model" />
+                        </section>
+                    </div>
+
+                    <partial name="NewIssuePartial" />
+                </div>
+            </section>
+        </div>
