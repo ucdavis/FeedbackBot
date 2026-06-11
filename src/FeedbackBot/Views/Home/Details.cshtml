@@ -33,7 +33,7 @@
                 <p class="text-sm font-bold mb-2 uppercase text-base-content/70">@appInfo.Name issue #@Model.Issue.Number
                 </p>
                 <article class="rounded-lg border border-main-border bg-base-100 p-6 shadow-sm">
-                    <div class="flex flex-col gap-5 md:flex-row items-end md:justify-between">
+                    <div class="flex flex-col gap-5 md:flex-row items-start md:justify-between">
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-4">
 
@@ -48,7 +48,7 @@
 
                         </div>
 
-                        <aside class="w-full md:w-56">
+                        <aside class="w-full md:w-56 md:self-end border-t-5 pt-3 border-primary/30">
                             <p class="text-2xl font-extrabold">@Model.Issue.NumOfVotes @(Model.Issue.NumOfVotesInt == 1 ? "vote"                        : "votes")</p>
                             <p class="mt-3 text-sm uppercase text-base-content/70">Upvoted by</p>
                             <p class="break-words text-base-content">@Model.Issue.StringOfVoters</p>
@@ -77,7 +77,7 @@
                 <section class="mt-6">
                     <div class="mb-4 flex items-center justify-between">
                         <h3 class="text-xl font-extrabold">@Model.Comments.Count @(Model.Comments.Count == 1 ? "Comment" :
-                                                                                                                                                                                         "Comments")</h3>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                     "Comments")</h3>
                         </div>
 
                         @if (Model.Comments.Count == 0)
@@ -97,7 +97,8 @@
                                             <p class="font-bold">@comment.Author</p>
                                             <p class="text-sm text-base-content/60">@comment.CreateDate</p>
                                         </div>
-                                        <p class="mt-4 whitespace-pre-line text-sm leading-6 text-base-content/80">@comment.Body</p>
+                                        <p class="mt-4 whitespace-pre-line text-sm leading-6 text-base-content/80 max-w-5xl">@comment.Body
+                                        </p>
                                     </article>
                                 }
                             </div>
