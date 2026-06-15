@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using FeedbackBot.Models;
@@ -12,6 +13,7 @@ namespace FeedbackBot.Controllers
     [Authorize]
     public class HomeController : Controller
     {
+        private const string GitHubRateLimitMessage = "We couldn't load feedback right now. Please try again later.";
         private readonly IGitHubService _gitHubService;
 
         public HomeController(IGitHubService gitHubService)
@@ -19,9 +21,26 @@ namespace FeedbackBot.Controllers
             _gitHubService = gitHubService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             ViewData["Message"] = "Welcome";
+
+            var issueCounts = new Dictionary<string, int>();
+
+            try
+            {
+                foreach (var app in AppCatalog.Apps)
+                {
+                    var issues = await _gitHubService.GetIssues(app.AppName);
+                    issueCounts[app.AppName] = issues.Count();
+                }
+            }
+            catch (RateLimitExceededException)
+            {
+                ViewData["GitHubError"] = GitHubRateLimitMessage;
+            }
+
+            ViewData["IssueCounts"] = issueCounts;
 
             return View();
         }
@@ -29,16 +48,25 @@ namespace FeedbackBot.Controllers
         [HttpGet("/app/{appName}")]
         public async Task<IActionResult> App(string appName)
         {
-            var issues = await _gitHubService.GetIssues(appName); 
-
-            // List out all the current issues
             var issueContainerList = new List<IssueContainer>();
-            foreach (var i in issues)
+
+            try
             {
-                var newIssueContainer = new IssueContainer { Kerberos = User.Identity.Name };
-                newIssueContainer.Deserialize(i);
-                issueContainerList.Add(newIssueContainer);
+                var issues = await _gitHubService.GetIssues(appName);
+
+                // List out all the current issues
+                foreach (var i in issues)
+                {
+                    var newIssueContainer = new IssueContainer { Kerberos = User.Identity.Name };
+                    newIssueContainer.Deserialize(i);
+                    issueContainerList.Add(newIssueContainer);
+                }
             }
+            catch (RateLimitExceededException)
+            {
+                ViewData["GitHubError"] = GitHubRateLimitMessage;
+            }
+
             ViewData["AppName"] = appName;
             ViewData["Message"] = "Current Feedback for " + appName;
 
@@ -76,15 +104,24 @@ namespace FeedbackBot.Controllers
                 return RedirectToAction("App", "home", new { appName });
             }
 
-            var results = await _gitHubService.Search(appName, searchInput);
-
             var issueContainerList = new List<IssueContainer>();
-            foreach (var i in results.Items)
+
+            try
             {
-                var newIssueContainer = new IssueContainer { Kerberos = User.Identity.Name };
-                newIssueContainer.Deserialize(i);
-                issueContainerList.Add(newIssueContainer);
+                var results = await _gitHubService.Search(appName, searchInput);
+
+                foreach (var i in results.Items)
+                {
+                    var newIssueContainer = new IssueContainer { Kerberos = User.Identity.Name };
+                    newIssueContainer.Deserialize(i);
+                    issueContainerList.Add(newIssueContainer);
+                }
             }
+            catch (RateLimitExceededException)
+            {
+                ViewData["GitHubError"] = GitHubRateLimitMessage;
+            }
+
             ViewData["AppName"] = appName;
             ViewData["SearchTerm"] = searchInput;
             ViewData["Message"] = "Search Results For  " + searchInput + " In " + appName;
@@ -154,45 +191,54 @@ namespace FeedbackBot.Controllers
         [HttpGet("/issues/{appName}/{id}")]
         public async Task<IActionResult> Details(string appName, int id)
         {
-            // Getting issue
-            var issue = await _gitHubService.GetIssue(appName, id);
-            var newIssueContainer = new IssueContainer { Kerberos = User.Identity.Name };
-            newIssueContainer.Deserialize(issue);
-
-            // Getting all comments in the issue
-            var issueComments = await _gitHubService.GetComments(appName, id);
-            var listOfComments = new List<CommentContainer>();
-
-            foreach (var i in issueComments) {
-
-                var indexOfLine = i.Body.IndexOf ("--------------------");
-                // add to the list if the issue is from FeedbackBot.
-                if (indexOfLine >= 0) {
-
-                    var bodycomment = i.Body.Substring (0, indexOfLine);
-                    // don't add to the list if its an issue with empty comment.
-                    if (!String.IsNullOrWhiteSpace (bodycomment)) {
-                        var commentContainer = new CommentContainer ();
-                        commentContainer.Deserialize (i, bodycomment);
-                        listOfComments.Add (commentContainer);
-                    }
-                }
-            }
-
-            // Update model view
-            var issuesView = new IssueDetailsViewModel
-            {
-                Comments = listOfComments,
-                Issue = newIssueContainer
-            };
-
-            if (TempData["voteValidationMessage"] != null)
-            {
-                issuesView.VoteMessage = TempData["voteValidationMessage"].ToString();
-            }
             ViewData["AppName"] = appName;
 
-            return View(issuesView);
+            try
+            {
+                // Getting issue
+                var issue = await _gitHubService.GetIssue(appName, id);
+                var newIssueContainer = new IssueContainer { Kerberos = User.Identity.Name };
+                newIssueContainer.Deserialize(issue);
+
+                // Getting all comments in the issue
+                var issueComments = await _gitHubService.GetComments(appName, id);
+                var listOfComments = new List<CommentContainer>();
+
+                foreach (var i in issueComments) {
+
+                    var indexOfLine = i.Body.IndexOf ("--------------------");
+                    // add to the list if the issue is from FeedbackBot.
+                    if (indexOfLine >= 0) {
+
+                        var bodycomment = i.Body.Substring (0, indexOfLine);
+                        // don't add to the list if its an issue with empty comment.
+                        if (!String.IsNullOrWhiteSpace (bodycomment)) {
+                            var commentContainer = new CommentContainer ();
+                            commentContainer.Deserialize (i, bodycomment);
+                            listOfComments.Add (commentContainer);
+                        }
+                    }
+                }
+
+                // Update model view
+                var issuesView = new IssueDetailsViewModel
+                {
+                    Comments = listOfComments,
+                    Issue = newIssueContainer
+                };
+
+                if (TempData["voteValidationMessage"] != null)
+                {
+                    issuesView.VoteMessage = TempData["voteValidationMessage"].ToString();
+                }
+
+                return View(issuesView);
+            }
+            catch (RateLimitExceededException)
+            {
+                ViewData["GitHubError"] = GitHubRateLimitMessage;
+                return View(new IssueDetailsViewModel());
+            }
         }
 
         public IActionResult Error()

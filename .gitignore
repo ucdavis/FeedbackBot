@@ -158,6 +158,9 @@ PublishScripts/
 !**/packages/build/
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/packages/repositories.config
+
+# Node
+node_modules/
 # NuGet v3's project.json files produces more ignoreable files
 *.nuget.props
 *.nuget.targets

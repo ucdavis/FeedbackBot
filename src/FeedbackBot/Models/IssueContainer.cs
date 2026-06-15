@@ -63,7 +63,7 @@ namespace FeedbackBot.Models
 
             // Feedback
             var indexOfLine = issueBody.IndexOf("--------------------");
-            Body = issueBody.Substring(0, indexOfLine);
+            Body = issueBody.Substring(0, indexOfLine).Trim();
 
             // Voters
             var indexOfVoters = issueBody.IndexOf("Voters:");

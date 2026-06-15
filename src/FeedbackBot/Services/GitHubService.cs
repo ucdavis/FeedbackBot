@@ -32,8 +32,11 @@ namespace FeedbackBot.Services
             var settings = appSettings.Value;
 
             client = new GitHubClient(new ProductHeaderValue("FeedbackBot"));
-            
-            client.Credentials = new Credentials(settings.GitHubToken);
+
+            if (!string.IsNullOrWhiteSpace(settings.GitHubToken))
+            {
+                client.Credentials = new Credentials(settings.GitHubToken);
+            }
         }
 
         public async Task<IEnumerable<Issue>> GetIssues(string appName)

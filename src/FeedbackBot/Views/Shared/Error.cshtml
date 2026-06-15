@@ -2,13 +2,15 @@
     ViewData["Title"] = "Error";
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<div class="container">
+    <section class="rounded-lg border border-main-border bg-base-100 p-8 shadow-sm">
+        <p class="text-sm font-bold uppercase text-error">Error</p>
+        <h2 class="mt-2 text-3xl font-extrabold">Something went wrong.</h2>
+        <p class="mt-4 text-base text-base-content/70">An error occurred while processing your request.</p>
 
-<h3>Development Mode</h3>
-<p>
-    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
-</p>
-<p>
-    <strong>Development environment should not be enabled in deployed applications</strong>, as it can result in sensitive information from exceptions being displayed to end users. For local debugging, development environment can be enabled by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>, and restarting the application.
-</p>
+        <div class="mt-6 rounded-md bg-base-200 p-4 text-sm text-base-content/70">
+            <p class="font-bold text-base-content">Development mode</p>
+            <p class="mt-2">Set <code class="rounded bg-base-300 px-1 py-0.5">ASPNETCORE_ENVIRONMENT</code> to <code class="rounded bg-base-300 px-1 py-0.5">Development</code> locally to see detailed exception information.</p>
+        </div>
+    </section>
+</div>

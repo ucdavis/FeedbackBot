@@ -1,48 +1,54 @@
 @model IReadOnlyList<FeedbackBot.Models.IssueContainer>
 
-@foreach (var issue in Model)
+@{
+    var appInfo = AppCatalog.Get(ViewData["AppName"]?.ToString());
+}
+
+@if (Model.Count == 0)
 {
-    <div class="issueCard">
-        <div class="leftCard">
-            <!-- <img class= "leftCols"  src="~/media/lefthand.svg" alt=""> -->
-        </div>
-        <div class="rightCard">
-            <a href="@Url.Action("Details", new { appName = ViewData["AppName"], id = issue.Number })"><h3 class="title">@issue.Title</h3></a>
-            <div class="user">
-                <div class="userWritten">
-                    <p class="user_name"><b>by</b> @issue.Author</p>
-                    <!-- should also include date/time stamp -->
-                </div>
-            </div>
-            <div class="border-wrap">
-                <div class=" description">
-                    <span>@issue.Body</span><br />
-                </div>
-            </div>
+    <div class="rounded-md border border-dashed border-main-border bg-base-100 p-8 text-center">
+        <p class="font-bold text-base-content">No issues found</p>
+        <p class="mt-1 text-sm text-base-content/70">Try another search or submit new feedback.</p>
+    </div>
+}
+else
+{
+    <div class="space-y-4">
+        @foreach (var issue in Model)
+        {
+            <article class="rounded-md border border-main-border bg-base-100 p-5 transition hover:border-primary/30">
+                <div class="flex flex-col gap-6 xl:flex-row xl:justify-between">
+                    <div class="flex min-w-0 flex-1">
 
-            <div class="vote">
-                <p>
-                    <b>Upvoted by:</b>
-                    @issue.StringOfVoters
-                </p>
-                <br>
-                <div class="voteSection">
-                    <div class="voteButton">
-                        @using (Html.BeginForm("vote", "Home"))
-                        {
-                            <input class="voteID" name="voteID" value="@issue.Number" type="hidden" />
-                            <input name="appName" value="@ViewData["AppName"]" type="hidden" />
-                            <input type="submit" class="buttonID" value="@issue.VoteState" id="@issue.Number" />
-                        }
-                        <p class="voteNum"> | </p>
-                        <p class="voteNum">@issue.NumOfVotes</p>
+                        <div class="min-w-0 flex-1">
+                            <a class="group inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                               href="@Url.Action("Details", new { appName = ViewData["AppName"], id = issue.Number })">
+                                <h4 class="text-xl font-extrabold text-base-content group-hover:text-primary">@issue.Title</h4>
+                            </a>
+                            <p class="text-base-content/70">by @issue.Author</p>
+                            <p class="mt-4 max-w-148 whitespace-pre-line leading-relaxed">@issue.Body</p>
+                        </div>
                     </div>
-                    <a href="@Url.Action("Details", new {appName = ViewData["AppName"], id = issue.Number})">
-                        <button> comments (@issue.NumOfComments)</button>
-                    </a>
-                </div>
-            </div>
 
-        </div>
+                    <aside class="w-full xl:w-56 xl:self-end border-t-5 pt-3 border-primary/30">
+                        <p class="text-2xl font-extrabold">@issue.NumOfVotes @(issue.NumOfVotesInt == 1 ? "vote" : "votes")</p>
+                        <p class="mt-3 text-sm uppercase text-base-content/70">Upvoted by</p>
+                        <p class="break-words text-base-content">@issue.StringOfVoters</p>
+
+                        <div class="mt-4 flex gap-2">
+                            <form asp-action="Vote" asp-controller="Home" method="post" class="flex-1">
+                                <input name="voteID" value="@issue.Number" type="hidden" />
+                                <input name="appName" value="@ViewData["AppName"]" type="hidden" />
+                                <button type="submit" class="btn btn-primary w-full rounded-md">@issue.VoteState</button>
+                            </form>
+                            <a class="btn btn-outline btn-primary flex-1 rounded-md"
+                               href="@Url.Action("Details", new { appName = ViewData["AppName"], id = issue.Number })">
+                                @issue.NumOfComments @(issue.NumOfComments == 1 ? "comment" : "comments")
+                            </a>
+                        </div>
+                    </aside>
+                </div>
+            </article>
+        }
     </div>
 }

@@ -1,21 +1,40 @@
 @model IReadOnlyList<FeedbackBot.Models.IssueContainer>
 
-<div class="bodyDiv">
-    @{
-        ViewData["Title"] = "Home Page";
-    }
+@{
+    var appInfo = AppCatalog.Get(ViewData["AppName"]?.ToString());
+    ViewData["Title"] = "Search";
+}
 
-    <br />
+<div class="container">
+    <section>
+        <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div class="flex items-start gap-4">
+                <img class="mt-1 h-10 w-10 shrink-0 object-contain"
+                     src="@Url.Content(appInfo.IconPath)"
+                     alt=""
+                     aria-hidden="true" />
+                <div>
+                    <a class="text-sm font-bold uppercase text-primary hover:underline"
+                       href="@Url.Action("App", new { appName = ViewData["AppName"] })">Back to @appInfo.Name</a>
+                    <h2 class="mt-2 text-3xl font-extrabold text-base-content md:text-4xl">Search results</h2>
+                    <p class="mt-2 text-base text-base-content/70">Results for "@ViewData["SearchTerm"]" in @appInfo.Name.</p>
+                </div>
+            </div>
+            <span class="badge badge-primary">@Model.Count</span>
+        </div>
 
-    <a href="@Url.Action("App", new { appName = ViewData["AppName"] })">Back</a>
+        <div class="space-y-4">
+            @if (ViewData["GitHubError"] != null)
+            {
+                <div class="alert alert-info rounded-md">
+                    <span>@ViewData["GitHubError"]</span>
+                </div>
+            }
 
-    <h3 class="pageTitle">Search Results For @ViewData["SearchTerm"] in <a href="@Url.Action("App", new { appName = ViewData["AppName"] })">@ViewData["AppName"]</a></h3>
-
-    @{
-        Html.RenderPartial("SearchBarPartial");
-    }
-
-    @{
-        Html.RenderPartial("DisplayIssuesPartial");
-    }
+            <partial name="SearchBarPartial" />
+            <section class="rounded-lg border border-main-border bg-base-100 p-5 shadow-sm">
+                <partial name="DisplayIssuesPartial" model="Model" />
+            </section>
+        </div>
+    </section>
 </div>

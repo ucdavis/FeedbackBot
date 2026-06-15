@@ -1,10 +1,9 @@
-<div class="newWrapper">
-    <div id="newIssueBox">
-        @using (Html.BeginForm("search", "Home", new { appName = ViewData["AppName"] }))
-        {
-            <input type="hidden" name="appName" value="@ViewData["AppName"]" />
-            <input type="text" id="searchInput" placeholder="Search issues..." name="searchInput" />
-            <button type="submit">Submit</button>
-        }
-    </div>
-</div>
+<section>
+    <form asp-action="Search" asp-controller="Home" method="post" class="flex flex-col gap-3 sm:flex-row">
+        <input type="hidden" name="appName" value="@ViewData["AppName"]" />
+        <label class="sr-only" for="searchInput">Search issues</label>
+        <input class="input input-bordered min-h-12 flex-1 rounded-md bg-base-100" type="search" id="searchInput"
+               placeholder="Search issues..." name="searchInput" />
+        <button class="btn btn-primary min-h-12 rounded-md" type="submit">Search</button>
+    </form>
+</section>
