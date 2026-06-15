@@ -1,8 +1,7 @@
-using System;
 using System.IO;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace FeedbackBot
 {
@@ -10,38 +9,45 @@ namespace FeedbackBot
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            var contentRoot = GetContentRoot();
+
+            return Host.CreateDefaultBuilder(args)
+                .UseContentRoot(contentRoot)
+                .ConfigureAppConfiguration((context, config) =>
+                {
+                    config.Sources.Clear();
+
+                    config.SetBasePath(contentRoot)
+                        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                        .AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: false);
+
+                    if (context.HostingEnvironment.IsDevelopment())
+                    {
+                        config.AddUserSecrets<Program>(optional: true);
+                    }
+
+                    config.AddEnvironmentVariables();
+                    config.AddCommandLine(args);
+                })
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
+        }
+
+        private static string GetContentRoot()
         {
             var currentDirectory = Directory.GetCurrentDirectory();
             var projectDirectory = Path.Combine(currentDirectory, "src", "FeedbackBot");
-            var contentRoot = File.Exists(Path.Combine(projectDirectory, "appsettings.json"))
+
+            return File.Exists(Path.Combine(projectDirectory, "appsettings.json"))
                 ? projectDirectory
                 : currentDirectory;
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
-
-            var configurationBuilder = new ConfigurationBuilder()
-                .SetBasePath(contentRoot)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
-                .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: false);
-
-            if (environment == "Development")
-            {
-                configurationBuilder.AddUserSecrets<Program>(optional: true);
-            }
-
-            var configuration = configurationBuilder
-                .AddEnvironmentVariables()
-                .AddCommandLine(args)
-                .Build();
-
-            return new WebHostBuilder()
-                .UseKestrel()
-                .UseContentRoot(contentRoot)
-                .UseConfiguration(configuration)
-                .UseStartup<Startup>();
         }
     }
 }
