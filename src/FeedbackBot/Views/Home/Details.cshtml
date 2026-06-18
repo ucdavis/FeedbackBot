@@ -70,7 +70,7 @@
                         <label class="sr-only" for="descriptionTextBoxComment">Comment</label>
                         <textarea class="textarea textarea-bordered min-h-36 w-full rounded-md bg-base-100"
                                   placeholder="Type your comment here (required)" id="descriptionTextBoxComment" name="comment" required data-comment-text></textarea>
-                        <button class="btn btn-primary rounded-md" type="submit" data-comment-submit disabled>Submit</button>
+                        <button class="btn btn-primary rounded-md" type="submit" data-comment-submit>Submit</button>
                     </form>
 
                     <script>
@@ -79,17 +79,17 @@
                             const commentInput = form?.querySelector("[data-comment-text]");
                             const submitButton = form?.querySelector("[data-comment-submit]");
 
-                            if (!commentInput || !submitButton) {
-                                return;
-                            }
-
                             const syncSubmitState = () => {
                                 submitButton.disabled = commentInput.value.trim().length === 0;
                             };
 
+                            if (!commentInput || !submitButton) {
+                                return;
+                            }
+
+                            syncSubmitState();
                             commentInput.addEventListener("input", syncSubmitState);
                             commentInput.addEventListener("change", syncSubmitState);
-                            syncSubmitState();
                         })();
                     </script>
                 </section>
