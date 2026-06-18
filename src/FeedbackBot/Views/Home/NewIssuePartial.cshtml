@@ -4,18 +4,20 @@
         <p class="mt-1 text-sm text-base-content/70">Create a new GitHub issue for @ViewData["AppName"].</p>
     </div>
 
-    <form asp-action="CreateIssue" asp-controller="Home" method="post" class="space-y-4">
+    <form asp-action="CreateIssue" asp-controller="Home" method="post" class="space-y-4" data-new-feedback-form>
         <input type="hidden" name="appName" value="@ViewData["AppName"]" />
 
         <div>
             <label class="label" for="title-input">
-                <span class="label-text font-bold">Title</span>
+                <span class="label-text font-bold">Title <span class="text-error" aria-hidden="true">*</span></span>
             </label>
             <input class="input input-bordered min-h-12 w-full rounded-md bg-base-100"
                    type="text"
                    id="title-input"
-                   placeholder="Short summary"
-                   name="title" />
+                   placeholder="Short summary (required)"
+                   name="title"
+                   required
+                   data-feedback-title />
         </div>
 
         <div>
@@ -28,6 +30,26 @@
                       name="description"></textarea>
         </div>
 
-        <button class="btn btn-primary w-full rounded-md" type="submit">Submit</button>
+        <button class="btn btn-primary w-full rounded-md" type="submit" data-feedback-submit disabled>Submit</button>
     </form>
+
+    <script>
+        (() => {
+            const form = document.currentScript.previousElementSibling;
+            const titleInput = form?.querySelector("[data-feedback-title]");
+            const submitButton = form?.querySelector("[data-feedback-submit]");
+
+            if (!titleInput || !submitButton) {
+                return;
+            }
+
+            const syncSubmitState = () => {
+                submitButton.disabled = titleInput.value.trim().length === 0;
+            };
+
+            titleInput.addEventListener("input", syncSubmitState);
+            titleInput.addEventListener("change", syncSubmitState);
+            syncSubmitState();
+        })();
+    </script>
 </section>
