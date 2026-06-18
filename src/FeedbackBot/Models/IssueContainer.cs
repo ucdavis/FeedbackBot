@@ -28,6 +28,8 @@ namespace FeedbackBot.Models
 
         public string Author { get; set; }
 
+        public string CreatedDate { get; set; }
+
         public int NumOfComments { get; set; }
 
         // Returns string of description for GitHub issue body
@@ -46,6 +48,7 @@ namespace FeedbackBot.Models
             var issueBody = issue.Body;
             Title = issue.Title;
             Number = issue.Number;
+            CreatedDate = issue.CreatedAt.ToString("M/d/yyyy");
 
             // Number of comments
             NumOfComments = issue.Comments;
