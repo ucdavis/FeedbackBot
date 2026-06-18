@@ -133,6 +133,12 @@ namespace FeedbackBot.Controllers
         public async Task<ActionResult> AddComment(string comment, string voteID, string appName)
         {
             var id = int.Parse(voteID);
+
+            if (String.IsNullOrWhiteSpace(comment))
+            {
+                return RedirectToAction("details", "home", new { appName = appName, id = voteID });
+            }
+
             var body = $"{comment} \r\n" +
                       "--------------------\r\n" +
                       $"Author: {User.Identity.Name}";
