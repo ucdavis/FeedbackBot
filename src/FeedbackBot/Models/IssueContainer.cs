@@ -28,6 +28,8 @@ namespace FeedbackBot.Models
 
         public string Author { get; set; }
 
+        public DateTimeOffset CreatedAt { get; set; }
+
         public string CreatedDate { get; set; }
 
         public int NumOfComments { get; set; }
@@ -48,7 +50,8 @@ namespace FeedbackBot.Models
             var issueBody = issue.Body;
             Title = issue.Title;
             Number = issue.Number;
-            CreatedDate = issue.CreatedAt.ToString("M/d/yyyy");
+            CreatedAt = issue.CreatedAt;
+            CreatedDate = CreatedAt.ToString("M/d/yyyy");
 
             // Number of comments
             NumOfComments = issue.Comments;

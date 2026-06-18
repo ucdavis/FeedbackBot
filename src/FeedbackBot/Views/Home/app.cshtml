@@ -2,6 +2,13 @@
 
 @{
     var appInfo = AppCatalog.Get(ViewData["AppName"]?.ToString());
+    var currentSort = ViewData["Sort"]?.ToString() ?? "created-desc";
+    var isDateSort = currentSort.StartsWith("created", StringComparison.Ordinal);
+    var isVoteSort = currentSort.StartsWith("votes", StringComparison.Ordinal);
+    var nextDateSort = currentSort == "created-desc" ? "created-asc" : "created-desc";
+    var nextVoteSort = currentSort == "votes-desc" ? "votes-asc" : "votes-desc";
+    var dateTabClass = isDateSort ? "tab tab-active" : "tab";
+    var voteTabClass = isVoteSort ? "tab tab-active" : "tab";
     ViewData["Title"] = appInfo.Name;
 }
 
@@ -34,10 +41,83 @@
                         <partial name="SearchBarPartial" />
 
                         <section>
-                            <div class="mt-6 mb-4 flex items-center gap-4">
+                            <div class="mt-6 mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <span class="shrink-0 text-xl font-bold text-base-content">
                                     @Model.Count @(Model.Count == 1 ? "issue" : "issues")
                                 </span>
+                                <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                                    <span class="text-sm font-bold text-base-content/70">Sort by</span>
+                                    <div class="tabs tabs-box" role="tablist">
+                                        <a class="@dateTabClass"
+                                           asp-action="App"
+                                           asp-controller="Home"
+                                           asp-route-appName="@ViewData["AppName"]"
+                                           asp-route-sort="@nextDateSort"
+                                           data-sort-link
+                                           role="tab"
+                                           aria-selected="@isDateSort.ToString().ToLowerInvariant()">
+                                            Date
+                                            @if (isDateSort)
+                                            {
+                                                <span aria-hidden="true">@(currentSort == "created-asc" ? Html.Raw("&uarr;") : Html.Raw("&darr;"))</span>
+                                            }
+                                        </a>
+                                        <a class="@voteTabClass"
+                                           asp-action="App"
+                                           asp-controller="Home"
+                                           asp-route-appName="@ViewData["AppName"]"
+                                           asp-route-sort="@nextVoteSort"
+                                           data-sort-link
+                                           role="tab"
+                                           aria-selected="@isVoteSort.ToString().ToLowerInvariant()">
+                                            Votes
+                                            @if (isVoteSort)
+                                            {
+                                                <span aria-hidden="true">@(currentSort == "votes-asc" ? Html.Raw("&uarr;") : Html.Raw("&darr;"))</span>
+                                            }
+                                        </a>
+                                    </div>
+                                    <span class="inline-flex items-center gap-2 text-sm font-bold text-primary" data-sort-loading hidden>
+                                        <span class="sort-spinner" aria-hidden="true"></span>
+                                        <span>Sorting</span>
+                                    </span>
+                                </div>
+                                <style>
+                                    .sort-spinner {
+                                        width: 1rem;
+                                        height: 1rem;
+                                        border: 2px solid currentColor;
+                                        border-right-color: transparent;
+                                        border-radius: 9999px;
+                                        animation: sort-spinner 0.75s linear infinite;
+                                    }
+
+                                    @@keyframes sort-spinner {
+                                        to {
+                                            transform: rotate(360deg);
+                                        }
+                                    }
+                                </style>
+                                <script>
+                                    (() => {
+                                        const sortLinks = document.querySelectorAll("[data-sort-link]");
+                                        const sortLoading = document.querySelector("[data-sort-loading]");
+
+                                        if (!sortLinks.length || !sortLoading) {
+                                            return;
+                                        }
+
+                                        sortLinks.forEach((sortLink) => {
+                                            sortLink.addEventListener("click", (event) => {
+                                                if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+                                                    return;
+                                                }
+
+                                                sortLoading.hidden = false;
+                                            });
+                                        });
+                                    })();
+                                </script>
                             </div>
                             <partial name="DisplayIssuesPartial" model="Model" />
                         </section>

@@ -14,6 +14,7 @@ namespace FeedbackBot.Controllers
     public class HomeController : Controller
     {
         private const string GitHubRateLimitMessage = "We couldn't load feedback right now. Please try again later.";
+        private const string DefaultIssueSort = "created-desc";
         private readonly IGitHubService _gitHubService;
 
         public HomeController(IGitHubService gitHubService)
@@ -46,7 +47,7 @@ namespace FeedbackBot.Controllers
         }
 
         [HttpGet("/app/{appName}")]
-        public async Task<IActionResult> App(string appName)
+        public async Task<IActionResult> App(string appName, string sort = DefaultIssueSort)
         {
             var issueContainerList = new List<IssueContainer>();
 
@@ -69,8 +70,9 @@ namespace FeedbackBot.Controllers
 
             ViewData["AppName"] = appName;
             ViewData["Message"] = "Current Feedback for " + appName;
+            ViewData["Sort"] = NormalizeIssueSort(sort);
 
-            return View(issueContainerList);
+            return View(SortIssues(issueContainerList, sort));
         }
 
         /*
@@ -127,6 +129,28 @@ namespace FeedbackBot.Controllers
             ViewData["Message"] = "Search Results For  " + searchInput + " In " + appName;
 
             return View(issueContainerList);
+        }
+
+        private static string NormalizeIssueSort(string sort)
+        {
+            return sort switch
+            {
+                "votes-desc" => "votes-desc",
+                "votes-asc" => "votes-asc",
+                "created-asc" => "created-asc",
+                _ => DefaultIssueSort
+            };
+        }
+
+        private static List<IssueContainer> SortIssues(List<IssueContainer> issues, string sort)
+        {
+            return NormalizeIssueSort(sort) switch
+            {
+                "votes-desc" => issues.OrderByDescending(issue => issue.NumOfVotesInt).ThenByDescending(issue => issue.CreatedAt).ToList(),
+                "votes-asc" => issues.OrderBy(issue => issue.NumOfVotesInt).ThenByDescending(issue => issue.CreatedAt).ToList(),
+                "created-asc" => issues.OrderBy(issue => issue.CreatedAt).ToList(),
+                _ => issues.OrderByDescending(issue => issue.CreatedAt).ToList()
+            };
         }
 
         [HttpPost("addComment")]
