@@ -25,7 +25,7 @@ else
                                href="@Url.Action("Details", new { appName = ViewData["AppName"], id = issue.Number })">
                                 <h4 class="text-xl font-extrabold text-base-content group-hover:text-primary">@issue.Title</h4>
                             </a>
-                            <p class="text-base-content/70">by @issue.Author</p>
+                            <p class="text-base-content/70">by @issue.Author &middot; created @issue.CreatedDate</p>
                             <p class="mt-4 max-w-148 whitespace-pre-line leading-relaxed">@issue.Body</p>
                         </div>
                     </div>
