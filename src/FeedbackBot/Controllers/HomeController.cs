@@ -133,6 +133,12 @@ namespace FeedbackBot.Controllers
         public async Task<ActionResult> AddComment(string comment, string voteID, string appName)
         {
             var id = int.Parse(voteID);
+
+            if (String.IsNullOrWhiteSpace(comment))
+            {
+                return RedirectToAction("details", "home", new { appName = appName, id = voteID });
+            }
+
             var body = $"{comment} \r\n" +
                       "--------------------\r\n" +
                       $"Author: {User.Identity.Name}";
@@ -205,18 +211,12 @@ namespace FeedbackBot.Controllers
                 var listOfComments = new List<CommentContainer>();
 
                 foreach (var i in issueComments) {
+                    var commentContainer = new CommentContainer ();
+                    commentContainer.Deserialize (i);
 
-                    var indexOfLine = i.Body.IndexOf ("--------------------");
-                    // add to the list if the issue is from FeedbackBot.
-                    if (indexOfLine >= 0) {
-
-                        var bodycomment = i.Body.Substring (0, indexOfLine);
-                        // don't add to the list if its an issue with empty comment.
-                        if (!String.IsNullOrWhiteSpace (bodycomment)) {
-                            var commentContainer = new CommentContainer ();
-                            commentContainer.Deserialize (i, bodycomment);
-                            listOfComments.Add (commentContainer);
-                        }
+                    // don't add to the list if its an issue with empty comment.
+                    if (!String.IsNullOrWhiteSpace (commentContainer.Body)) {
+                        listOfComments.Add (commentContainer);
                     }
                 }
 

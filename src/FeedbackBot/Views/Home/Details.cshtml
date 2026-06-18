@@ -64,14 +64,34 @@
 
                 <section class="mt-6 rounded-lg border border-main-border bg-base-100 p-6 shadow-sm">
                     <h3 class="text-xl font-extrabold">Add a comment</h3>
-                    <form asp-action="AddComment" asp-controller="Home" method="post" class="mt-4 space-y-4">
+                    <form asp-action="AddComment" asp-controller="Home" method="post" class="mt-4 space-y-4" data-new-comment-form>
                         <input type="hidden" name="voteID" value="@Model.Issue.Number" />
                         <input type="hidden" name="appName" value="@ViewData["AppName"]" />
                         <label class="sr-only" for="descriptionTextBoxComment">Comment</label>
                         <textarea class="textarea textarea-bordered min-h-36 w-full rounded-md bg-base-100"
-                                  placeholder="Type your comment here" id="descriptionTextBoxComment" name="comment"></textarea>
-                        <button class="btn btn-primary rounded-md" type="submit">Submit</button>
+                                  placeholder="Type your comment here (required)" id="descriptionTextBoxComment" name="comment" required data-comment-text></textarea>
+                        <button class="btn btn-primary rounded-md" type="submit" data-comment-submit>Submit</button>
                     </form>
+
+                    <script>
+                        (() => {
+                            const form = document.currentScript.previousElementSibling;
+                            const commentInput = form?.querySelector("[data-comment-text]");
+                            const submitButton = form?.querySelector("[data-comment-submit]");
+
+                            const syncSubmitState = () => {
+                                submitButton.disabled = commentInput.value.trim().length === 0;
+                            };
+
+                            if (!commentInput || !submitButton) {
+                                return;
+                            }
+
+                            syncSubmitState();
+                            commentInput.addEventListener("input", syncSubmitState);
+                            commentInput.addEventListener("change", syncSubmitState);
+                        })();
+                    </script>
                 </section>
 
                 <section class="mt-6">
